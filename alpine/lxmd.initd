@@ -1,0 +1,17 @@
+#!/sbin/openrc-run
+
+description="LXMF Router Daemon"
+
+command="/opt/reticulum/bin/lxmd"
+command_args="--service --config /var/lib/reticulum/lxmd --rnsconfig /var/lib/reticulum/rnsd"
+command_user="reticulum:reticulum"
+command_background=true
+pidfile="/run/${RC_SVCNAME}.pid"
+
+depend() {
+    need net rnsd
+}
+
+start_pre() {
+    checkpath --directory --owner reticulum:reticulum --mode 0750 /var/lib/reticulum
+}

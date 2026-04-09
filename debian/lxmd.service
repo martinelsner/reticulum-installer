@@ -1,0 +1,29 @@
+[Unit]
+Description=LXMF Router Daemon
+After=network.target rnsd.service
+Wants=network.target rnsd.service
+
+[Service]
+Type=simple
+User=reticulum
+Group=reticulum
+ExecStart=/opt/reticulum/bin/lxmd --config /var/lib/reticulum/lxmd --rnsconfig /var/lib/reticulum/rnsd
+Restart=on-failure
+RestartSec=10s
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=yes
+ReadWritePaths=/var/lib/reticulum
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+PrivateDevices=no
+
+[Install]
+WantedBy=multi-user.target

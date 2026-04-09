@@ -1,0 +1,29 @@
+[Unit]
+Description=Reticulum Network Stack Daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=reticulum
+Group=reticulum
+ExecStart=/opt/reticulum/bin/rnsd --config /var/lib/reticulum/rnsd
+Restart=on-failure
+RestartSec=10s
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=yes
+ReadWritePaths=/var/lib/reticulum
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+PrivateDevices=no
+
+[Install]
+WantedBy=multi-user.target

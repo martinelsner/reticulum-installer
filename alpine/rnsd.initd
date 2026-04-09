@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+
+description="Reticulum Network Stack Daemon"
+
+command="/opt/reticulum/bin/rnsd"
+command_args="--service --config /var/lib/reticulum/rnsd"
+command_user="reticulum:reticulum"
+command_background=true
+pidfile="/run/${RC_SVCNAME}.pid"
+
+depend() {
+    need net
+    after firewall
+}
+
+start_pre() {
+    checkpath --directory --owner reticulum:reticulum --mode 0750 /var/lib/reticulum
+}

@@ -1,0 +1,144 @@
+#!/bin/sh
+#
+# Reticulum + LXMF Installer for Alpine Linux
+#
+# Installs rnsd and lxmd as OpenRC services with a dedicated
+# system user, init scripts, and default configurations.
+#
+# Usage: sudo sh install.sh
+#
+
+set -eu
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+DATA_DIR="/var/lib/reticulum"
+
+# ---------- Preflight ----------
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: This script must be run as root (sudo)."
+    exit 1
+fi
+
+echo "==> Reticulum + LXMF Installer (Alpine)"
+echo ""
+
+# ---------- Dependencies ----------
+
+echo "--- Installing system dependencies ---"
+apk update --quiet
+apk add --quiet python3 py3-pip py3-virtualenv
+echo "    System packages installed."
+
+VENV_DIR="/opt/reticulum"
+
+echo "--- Installing Python packages ---"
+if [ ! -d "$VENV_DIR" ]; then
+    python3 -m venv "$VENV_DIR"
+    echo "    Created virtualenv at $VENV_DIR"
+fi
+# 'bleak' is included to support running RNodes via Bluetooth
+"$VENV_DIR/bin/pip" install --quiet rns lxmf bleak
+echo "    rns, lxmf, and bleak installed in virtualenv."
+
+# Symlink binaries to system PATH
+for bin in rnsd lxmd; do
+    ln -sf "$VENV_DIR/bin/${bin}" "/usr/local/bin/${bin}"
+    echo "    Symlinked ${bin} -> /usr/local/bin/${bin}"
+done
+
+# ---------- User & Group ----------
+
+echo ""
+echo "--- Creating system user and group ---"
+
+if ! getent group reticulum > /dev/null 2>&1; then
+    addgroup -S reticulum
+    echo "    Created group: reticulum"
+else
+    echo "    Group 'reticulum' already exists."
+fi
+
+if ! id reticulum > /dev/null 2>&1; then
+    adduser -S -G reticulum -h "$DATA_DIR" -s /sbin/nologin -D reticulum
+    # Add to dialout group for RNode serial port access
+    addgroup reticulum dialout 2>/dev/null || true
+    echo "    Created user: reticulum (with dialout access for RNodes)"
+else
+    echo "    User 'reticulum' already exists."
+    addgroup reticulum dialout 2>/dev/null || true
+fi
+
+# ---------- Configuration ----------
+
+echo ""
+echo "--- Installing configuration files ---"
+
+install_config() {
+    src="$1"
+    dest="$2"
+
+    mkdir -p "$(dirname "$dest")"
+
+    if [ -f "$dest" ]; then
+        echo "    SKIP $dest (already exists, not overwriting)"
+    else
+        cp "$src" "$dest"
+        echo "    Installed $dest"
+    fi
+}
+
+install_config "${SCRIPT_DIR}/../config/rnsd.config" "${DATA_DIR}/rnsd/config"
+install_config "${SCRIPT_DIR}/../config/lxmd.config" "${DATA_DIR}/lxmd/config"
+
+chown -R reticulum:reticulum "$DATA_DIR"
+chmod 750 "$DATA_DIR"
+
+echo "    Ownership set to reticulum:reticulum on ${DATA_DIR}"
+
+# ---------- OpenRC Init Scripts ----------
+
+echo ""
+echo "--- Installing OpenRC init scripts ---"
+
+install -m 755 "${SCRIPT_DIR}/rnsd.initd" /etc/init.d/rnsd
+install -m 755 "${SCRIPT_DIR}/lxmd.initd" /etc/init.d/lxmd
+echo "    Installed /etc/init.d/rnsd"
+echo "    Installed /etc/init.d/lxmd"
+
+# ---------- Enable & Start ----------
+
+echo ""
+echo "--- Enabling and starting services ---"
+
+rc-update add rnsd default
+rc-service rnsd start
+echo "    rnsd: enabled and started."
+
+rc-update add lxmd default
+rc-service lxmd start
+echo "    lxmd: enabled and started."
+
+# ---------- Summary ----------
+
+echo ""
+echo "==========================================="
+echo "  Installation complete!"
+echo "==========================================="
+echo ""
+echo "  Services:"
+echo "    rnsd  -> rc-service rnsd status"
+echo "    lxmd  -> rc-service lxmd status"
+echo ""
+echo "  Configuration:"
+echo "    rnsd  -> ${DATA_DIR}/rnsd/config"
+echo "    lxmd  -> ${DATA_DIR}/lxmd/config"
+echo ""
+echo "  Logs:"
+echo "    /var/lib/reticulum/rnsd/logfile"
+echo "    /var/lib/reticulum/lxmd/logfile"
+echo ""
+echo "  To reconfigure, edit the config files and run:"
+echo "    rc-service rnsd restart && rc-service lxmd restart"
+echo ""
