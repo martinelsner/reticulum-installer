@@ -33,8 +33,12 @@ sudo systemctl status rnsd lxmd
 
 **Viewing Logs:**
 ```bash
+# Individual logs
 sudo journalctl -u rnsd -f
 sudo journalctl -u lxmd -f
+
+# Combined logs
+sudo journalctl -u rnsd -u lxmd -f
 ```
 
 **Restarting After Config Changes:**

@@ -34,8 +34,12 @@ rc-service lxmd status
 
 **Viewing Logs:**
 ```bash
-tail -f /var/lib/reticulum/rnsd/logfile
-tail -f /var/lib/reticulum/lxmd/logfile
+# Individual logs
+sudo tail -f /var/lib/reticulum/rnsd/logfile
+sudo tail -f /var/lib/reticulum/lxmd/logfile
+
+# Combined logs
+sudo tail -f /var/lib/reticulum/rnsd/logfile /var/lib/reticulum/lxmd/logfile
 ```
 
 **Restarting After Config Changes:**
