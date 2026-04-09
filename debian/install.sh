@@ -27,8 +27,8 @@ echo ""
 # ---------- Dependencies ----------
 
 echo "--- Installing system dependencies ---"
-apt-get update -qq
-apt-get install -y -qq python3 python3-pip python3-venv > /dev/null
+apt-get update
+apt-get install -y python3 python3-pip python3-venv
 echo "    System packages installed."
 
 VENV_DIR="/opt/reticulum"
@@ -39,7 +39,7 @@ if [[ ! -d "$VENV_DIR" ]]; then
     echo "    Created virtualenv at $VENV_DIR"
 fi
 # 'bleak' is included to support running RNodes via Bluetooth
-"$VENV_DIR/bin/pip" install --quiet rns lxmf bleak
+"$VENV_DIR/bin/pip" install rns lxmf bleak
 echo "    rns, lxmf, and bleak installed in virtualenv."
 
 # Symlink binaries to system PATH

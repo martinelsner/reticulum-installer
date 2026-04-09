@@ -27,19 +27,19 @@ echo ""
 # ---------- Dependencies ----------
 
 echo "--- Installing system dependencies ---"
-apk update --quiet
-apk add --quiet python3 py3-pip py3-virtualenv
+apk update
+apk add python3 python3-dev py3-pip py3-virtualenv py3-cryptography py3-cffi build-base libffi-dev pkgconf
 echo "    System packages installed."
 
 VENV_DIR="/opt/reticulum"
 
 echo "--- Installing Python packages ---"
 if [ ! -d "$VENV_DIR" ]; then
-    python3 -m venv "$VENV_DIR"
+    python3 -m venv --system-site-packages "$VENV_DIR"
     echo "    Created virtualenv at $VENV_DIR"
 fi
 # 'bleak' is included to support running RNodes via Bluetooth
-"$VENV_DIR/bin/pip" install --quiet rns lxmf bleak
+"$VENV_DIR/bin/pip" install rns lxmf bleak
 echo "    rns, lxmf, and bleak installed in virtualenv."
 
 # Symlink binaries to system PATH
