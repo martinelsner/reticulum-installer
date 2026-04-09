@@ -7,12 +7,11 @@ Automated deployment for Debian-based systems. This environment leverages `apt` 
 To install `rnsd` and `lxmd` cleanly with all configurations and service dependencies, download the deployment files and run the installer from a temporary directory:
 
 ```bash
-curl -sSL <YOUR_TARBALL_URL_HERE> | tar -xz -C /tmp
-cd /tmp/reticulum-installer-main/debian
+sudo apt install curl
+curl -sSL https://codeberg.org/melsner/reticulum-installer/archive/main.tar.gz | tar -xz -C /tmp
+cd /tmp/reticulum-installer/debian
 sudo bash install.sh
 ```
-
-> **Note:** Replace `<YOUR_TARBALL_URL_HERE>` with the final tarball URL, and adjust the extracted directory name (`reticulum-installer-main`) if necessary depending on the final repository name.
 
 ## What This Does
 
