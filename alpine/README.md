@@ -24,6 +24,12 @@ Running the installer script will:
 5. Setup, enable, and start the OpenRC initialization scripts: `/etc/init.d/rnsd` and `/etc/init.d/lxmd`.
 6. Symlink the software to `/usr/local/bin` for system-wide accessibility.
 
+## Data Files
+
+Service data is stored at `/var/lib/reticulum/` with per-service subdirectories:
+- **`rnsd`**: `/var/lib/reticulum/rnsd/`
+- **`lxmd`**: `/var/lib/reticulum/lxmd/`
+
 ## Managing the Service
 
 **Service Status:**

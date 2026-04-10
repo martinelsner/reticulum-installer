@@ -24,6 +24,12 @@ Running the installer script will:
 5. Create, harden, enable, and start the systemd unit files: `rnsd.service` and `lxmd.service`.
 6. Symlink the software to `/usr/local/bin` for system-wide accessibility.
 
+## Data Files
+
+Service data is stored at `/var/lib/reticulum/` with per-service subdirectories:
+- **`rnsd`**: `/var/lib/reticulum/rnsd/`
+- **`lxmd`**: `/var/lib/reticulum/lxmd/`
+
 ## Managing the Service
 
 **Service Status:**
