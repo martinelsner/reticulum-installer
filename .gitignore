@@ -28,3 +28,5 @@ venv.bak/
 # Testing / Logs #
 ##################
 *.log
+
+.kilo

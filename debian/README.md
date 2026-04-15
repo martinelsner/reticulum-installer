@@ -22,7 +22,7 @@ Running the installer script will:
 3. Create the `reticulum` unprivileged system user.
 4. Establish `/var/lib/reticulum` as the data layout directory and copy across default OS-agnostic configurations.
 5. Create, harden, enable, and start the systemd unit files: `rnsd.service` and `lxmd.service`.
-6. Symlink the software to `/usr/local/bin` for system-wide accessibility.
+6. Symlink the software and status wrappers to `/usr/local/bin` for system-wide accessibility.
 
 ## Data Files
 
@@ -50,6 +50,23 @@ sudo journalctl -u rnsd -u lxmd -f
 **Restarting After Config Changes:**
 ```bash
 sudo systemctl restart rnsd lxmd
+```
+
+## Status Monitoring
+
+The installer also provides wrapper scripts for quick status checks:
+
+- **`rnsd-status`** - Runs `rnstatus` to display Reticulum network interfaces and transport status.
+- **`lxmd-status`** - Runs `lxmd --status` to display LXMF router status, including peer connections and message statistics.
+
+Both scripts automatically use the correct configuration paths. No additional arguments are required, but any extra arguments will be passed through to the underlying command.
+
+```bash
+# Check Reticulum status
+rnsd-status
+
+# Check LXMF status
+lxmd-status
 ```
 
 ## Uninstallation

@@ -22,7 +22,7 @@ Running the installer script will:
 3. Create the `reticulum` unprivileged system user.
 4. Establish `/var/lib/reticulum` as the data layout directory and copy across default OS-agnostic configurations.
 5. Setup, enable, and start the OpenRC initialization scripts: `/etc/init.d/rnsd` and `/etc/init.d/lxmd`.
-6. Symlink the software to `/usr/local/bin` for system-wide accessibility.
+6. Symlink the software and status wrappers to `/usr/local/bin` for system-wide accessibility.
 
 ## Data Files
 
@@ -51,6 +51,23 @@ sudo tail -f /var/lib/reticulum/rnsd/logfile /var/lib/reticulum/lxmd/logfile
 **Restarting After Config Changes:**
 ```bash
 rc-service rnsd restart && rc-service lxmd restart
+```
+
+## Status Monitoring
+
+The installer also provides wrapper scripts for quick status checks:
+
+- **`rnsd-status`** - Runs `rnstatus` to display Reticulum network interfaces and transport status.
+- **`lxmd-status`** - Runs `lxmd --status` to display LXMF router status, including peer connections and message statistics.
+
+Both scripts automatically use the correct configuration paths. No additional arguments are required, but any extra arguments will be passed through to the underlying command.
+
+```bash
+# Check Reticulum status
+rnsd-status
+
+# Check LXMF status
+lxmd-status
 ```
 
 ## Uninstallation

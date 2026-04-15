@@ -40,6 +40,8 @@ echo ""
 echo "--- Binaries ---"
 check "rnsd is installed"                 which rnsd
 check "lxmd is installed"                 which lxmd
+check "rnsd-status is installed"          which rnsd-status
+check "lxmd-status is installed"          which lxmd-status
 
 # --- Configuration ---
 echo ""

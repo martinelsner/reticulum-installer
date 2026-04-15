@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#
+# lxmd status monitor wrapper
+#
+# Runs lxmd --status to check lxmd status.
+#
+
+exec /opt/reticulum/bin/lxmd --config /var/lib/reticulum/lxmd --rnsconfig /var/lib/reticulum/rnsd --status "$@"

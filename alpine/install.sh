@@ -48,6 +48,12 @@ for bin in rnsd lxmd; do
     echo "    Symlinked ${bin} -> /usr/local/bin/${bin}"
 done
 
+# Symlink status wrapper scripts
+for wrapper in rnsd-status lxmd-status; do
+    ln -sf "${SCRIPT_DIR}/${wrapper}" "/usr/local/bin/${wrapper}"
+    echo "    Symlinked ${wrapper} -> /usr/local/bin/${wrapper}"
+done
+
 # ---------- User & Group ----------
 
 echo ""
