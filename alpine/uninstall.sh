@@ -37,6 +37,8 @@ rm -f /etc/init.d/lxmd
 echo "--- Removing executables and virtualenv ---"
 rm -f /usr/local/bin/rnsd
 rm -f /usr/local/bin/lxmd
+rm -f /usr/local/bin/rnsd-status
+rm -f /usr/local/bin/lxmd-status
 rm -rf /opt/reticulum
 
 # ---------- Summary ----------
