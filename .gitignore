@@ -28,3 +28,8 @@ venv.bak/
 # Testing / Logs #
 ##################
 *.log
+
+# Windows test oem output (generated during test runs) #
+windows/test/oem/
+
+.kilo

@@ -10,12 +10,13 @@ Choose your operating system to view detailed installation instructions:
 
 - [**Debian / Ubuntu / Linux Mint**](debian/README.md) (uses `systemd` and `apt`)
 - [**Alpine Linux**](alpine/README.md) (uses `OpenRC` and `apk`)
+- [**Windows**](windows/README.md) (uses `NSSM` and `winget`)
 
 ## Features
 - **Isolated:** Installs Python packages into a virtual environment at `/opt/reticulum`.
 - **Dedicated System User:** Services run as the unprivileged `reticulum` user. `dialout` access is granted for hardware interfaces like RNodes.
 - **Default Configuration:** Includes baseline configurations for typical router node setups.
-- **Testing:** Includes Docker-based integration tests.
+- **Testing:** Includes Docker-based integration tests (Linux) and KVM-based Windows VM tests.
 
 ## License
 
