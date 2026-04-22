@@ -12,7 +12,7 @@ let
   };
 in
 {
-  imports = [ reticulum.nixos ];
+   imports = [ reticulum.nixos.default ];
   services.reticulum.enable = true;
 }
 ```
