@@ -7,7 +7,7 @@ Wants=network.target
 Type=simple
 User=reticulum
 Group=reticulum
-ExecStart=/opt/reticulum/bin/rnsd --config /var/lib/reticulum/rnsd
+ExecStart=/opt/reticulum/bin/rnsd --config /etc/reticulum
 Restart=on-failure
 RestartSec=10s
 
@@ -15,7 +15,7 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=full
 ProtectHome=yes
-ReadWritePaths=/var/lib/reticulum
+ReadWritePaths=/etc/reticulum
 ProtectKernelTunables=yes
 ProtectKernelModules=yes
 ProtectControlGroups=yes

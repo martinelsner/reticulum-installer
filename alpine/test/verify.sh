@@ -45,12 +45,12 @@ check "lxmd-status is installed"          which lxmd-status
 # --- Configuration ---
 echo ""
 echo "--- Configuration ---"
-check "rnsd config exists"                test -f /var/lib/reticulum/rnsd/config
+check "rnsd config exists"                test -f /etc/reticulum/config
 check "lxmd config exists"                test -f /var/lib/reticulum/lxmd/config
-check "rnsd config has transport=yes"     grep -q "enable_transport = yes" /var/lib/reticulum/rnsd/config
+check "rnsd config has transport=yes"     grep -q "enable_transport = yes" /etc/reticulum/config
 check "lxmd config has node=yes"          grep -q "enable_node = yes" /var/lib/reticulum/lxmd/config
-check "Data dir owned by reticulum"       test "$(stat -c %U /var/lib/reticulum)" = "reticulum"
-check "Data dir permissions are 750"      test "$(stat -c %a /var/lib/reticulum)" = "750"
+check "Storage dir owned by reticulum"    test "$(stat -c %U /etc/reticulum/storage)" = "reticulum"
+check "Storage dir readable by all"       test "$(stat -c %a /etc/reticulum/storage)" = "755" 2>/dev/null || test "$(stat -c %a /etc/reticulum/storage)" = "775"
 
 # --- OpenRC Init Scripts ---
 echo ""
@@ -81,7 +81,7 @@ sh /opt/reticulum-installer/alpine/install.sh > /dev/null 2>&1
 check "Re-run exits successfully"         true
 check "rnsd still running after re-run"   rc-service rnsd status
 check "lxmd still running after re-run"   rc-service lxmd status
-check "Config not overwritten"            grep -q "enable_transport = yes" /var/lib/reticulum/rnsd/config
+check "Config not overwritten"            grep -q "enable_transport = yes" /etc/reticulum/config
 
 # --- Summary ---
 echo ""
@@ -92,10 +92,7 @@ echo ""
 
 if [ "$FAIL" -gt 0 ]; then
     echo "--- Debug: rnsd log ---"
-    cat /var/lib/reticulum/rnsd/logfile 2>/dev/null | tail -20 || true
-    echo ""
-    echo "--- Debug: lxmd log ---"
-    cat /var/lib/reticulum/lxmd/logfile 2>/dev/null | tail -20 || true
+
     exit 1
 fi
 

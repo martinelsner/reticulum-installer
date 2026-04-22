@@ -46,12 +46,12 @@ check "lxmd-status is installed"          which lxmd-status
 # --- Configuration ---
 echo ""
 echo "--- Configuration ---"
-check "rnsd config exists"                test -f /var/lib/reticulum/rnsd/config
+check "rnsd config exists"                test -f /etc/reticulum/config
 check "lxmd config exists"                test -f /var/lib/reticulum/lxmd/config
-check "rnsd config has transport=yes"     grep -q "enable_transport = yes" /var/lib/reticulum/rnsd/config
+check "rnsd config has transport=yes"     grep -q "enable_transport = yes" /etc/reticulum/config
 check "lxmd config has node=yes"          grep -q "enable_node = yes" /var/lib/reticulum/lxmd/config
-check "Data dir owned by reticulum"       test "$(stat -c %U /var/lib/reticulum)" = "reticulum"
-check "Data dir permissions are 750"      test "$(stat -c %a /var/lib/reticulum)" = "750"
+check "Storage dir owned by reticulum"    test "$(stat -c %U /etc/reticulum/storage)" = "reticulum"
+check "Storage dir readable by all"       test "$(stat -c %a /etc/reticulum/storage)" = "755" 2>/dev/null || test "$(stat -c %a /etc/reticulum/storage)" = "775"
 
 # --- Systemd Unit Files ---
 echo ""
@@ -82,7 +82,7 @@ bash /opt/reticulum-installer/debian/install.sh > /dev/null 2>&1
 check "Re-run exits successfully"         true
 check "rnsd still active after re-run"    systemctl is-active rnsd.service
 check "lxmd still active after re-run"    systemctl is-active lxmd.service
-check "Config not overwritten"            grep -q "enable_transport = yes" /var/lib/reticulum/rnsd/config
+check "Config not overwritten"            grep -q "enable_transport = yes" /etc/reticulum/config
 
 # --- Summary ---
 echo ""
@@ -94,10 +94,7 @@ echo ""
 if [[ $FAIL -gt 0 ]]; then
     # Dump logs for debugging
     echo "--- Debug: rnsd journal ---"
-    journalctl -u rnsd.service --no-pager -n 20 2>/dev/null || true
-    echo ""
-    echo "--- Debug: lxmd journal ---"
-    journalctl -u lxmd.service --no-pager -n 20 2>/dev/null || true
+
     exit 1
 fi
 

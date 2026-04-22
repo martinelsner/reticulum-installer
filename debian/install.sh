@@ -12,6 +12,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+CONFIG_DIR="/etc/reticulum"
 DATA_DIR="/var/lib/reticulum"
 
 # ---------- Preflight ----------
@@ -86,6 +87,15 @@ fi
 echo ""
 echo "--- Installing configuration files ---"
 
+# Create /etc/reticulum directory structure
+mkdir -p "${CONFIG_DIR}"
+# Storage directory for shared instance data
+mkdir -p "${CONFIG_DIR}/storage"
+
+# rnsd creates these at runtime — pre-create with correct ownership
+mkdir -p "${CONFIG_DIR}/interfaces"
+chown reticulum:reticulum "${CONFIG_DIR}/interfaces"
+
 install_config() {
     local src="$1"
     local dest="$2"
@@ -100,13 +110,32 @@ install_config() {
     fi
 }
 
-install_config "${SCRIPT_DIR}/../config/rnsd.config" "${DATA_DIR}/rnsd/config"
+install_config "${SCRIPT_DIR}/../config/rnsd.config" "${CONFIG_DIR}/config"
 install_config "${SCRIPT_DIR}/../config/lxmd.config" "${DATA_DIR}/lxmd/config"
 
-chown -R reticulum:reticulum "$DATA_DIR"
-chmod 750 "$DATA_DIR"
+# Set permissions per SHARED.md for shared-instance mode:
+# - /etc/reticulum: root:reticulum 775 (group write for daemon, world read/execute for clients)
+chown root:reticulum "${CONFIG_DIR}"
+chmod 775 "${CONFIG_DIR}"
 
-echo "    Ownership set to reticulum:reticulum on ${DATA_DIR}"
+chmod 644 "${CONFIG_DIR}/config"
+chmod 644 "${DATA_DIR}/lxmd/config"
+
+# Writable subdirs owned by reticulum
+chown -R reticulum:reticulum "${CONFIG_DIR}/storage"
+chown reticulum:reticulum "${CONFIG_DIR}/interfaces"
+# Ensure storage is world-readable (dirs 755, files get o+r via umask or explicit)
+chmod 755 "${CONFIG_DIR}/storage"
+chmod -R o+rX "${CONFIG_DIR}/storage"
+
+# Ensure lxmd data directory is owned by reticulum and readable by all for client access
+chown -R reticulum:reticulum "${DATA_DIR}/lxmd"
+chmod -R o+rX "${DATA_DIR}/lxmd"
+
+echo "    Permissions set for shared-instance mode."
+
+# Keep the daemon's home directory traversable by all (shared-instance clients need access)
+chmod 755 "$DATA_DIR"
 
 # ---------- Systemd Units ----------
 
@@ -146,7 +175,7 @@ echo "    rnsd  -> systemctl status rnsd"
 echo "    lxmd  -> systemctl status lxmd"
 echo ""
 echo "  Configuration:"
-echo "    rnsd  -> ${DATA_DIR}/rnsd/config"
+echo "    rnsd  -> ${CONFIG_DIR}/config"
 echo "    lxmd  -> ${DATA_DIR}/lxmd/config"
 echo ""
 echo "  Logs:"

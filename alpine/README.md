@@ -20,15 +20,19 @@ Running the installer script will:
 1. Install required system packages (`python3`, `py3-pip`, `py3-virtualenv`).
 2. Build a virtual environment at `/opt/reticulum` and securely install `rns` and `lxmf`.
 3. Create the `reticulum` unprivileged system user.
-4. Establish `/var/lib/reticulum` as the data layout directory and copy across default OS-agnostic configurations.
+4. Establish `/etc/reticulum` for Reticulum config, `/var/lib/reticulum/lxmd` for LXMF config, and `/etc/reticulum/storage` for shared storage.
 5. Setup, enable, and start the OpenRC initialization scripts: `/etc/init.d/rnsd` and `/etc/init.d/lxmd`.
 6. Symlink the software and status wrappers to `/usr/local/bin` for system-wide accessibility.
 
 ## Data Files
 
-Service data is stored at `/var/lib/reticulum/` with per-service subdirectories:
-- **`rnsd`**: `/var/lib/reticulum/rnsd/`
-- **`lxmd`**: `/var/lib/reticulum/lxmd/`
+Reticulum configuration is stored in `/etc/reticulum/`:
+- **`rnsd` config**: `/etc/reticulum/config`
+
+Shared instance storage (identities, path tables, caches) is at `/etc/reticulum/storage/`.
+
+LXMF configuration and data are stored in `/var/lib/reticulum/lxmd/`:
+- **`lxmd` config**: `/var/lib/reticulum/lxmd/config`
 
 ## Managing the Service
 
@@ -40,12 +44,13 @@ rc-service lxmd status
 
 **Viewing Logs:**
 ```bash
-# Individual logs
-sudo tail -f /var/lib/reticulum/rnsd/logfile
-sudo tail -f /var/lib/reticulum/lxmd/logfile
+# System logs via OpenRC
+rc-service rnsd status
+rc-service lxmd status
 
-# Combined logs
-sudo tail -f /var/lib/reticulum/rnsd/logfile /var/lib/reticulum/lxmd/logfile
+# If log_file is configured in the config:
+sudo tail -f /var/log/rnsd.log
+sudo tail -f /var/log/lxmd.log
 ```
 
 **Restarting After Config Changes:**
@@ -80,6 +85,6 @@ sudo sh uninstall.sh
 
 To purge the deployment entirely (including identities, messages and databases), also run:
 ```bash
-sudo rm -rf /var/lib/reticulum
+sudo rm -rf /etc/reticulum /var/lib/reticulum
 sudo deluser reticulum
 ```

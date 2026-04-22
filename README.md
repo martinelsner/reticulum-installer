@@ -17,6 +17,10 @@ Choose your operating system to view detailed installation instructions:
 - **Default Configuration:** Includes baseline configurations for typical router node setups.
 - **Testing:** Includes Docker-based integration tests.
 
+## See Also
+
+- [SHARED](SHARED.md) - Running a system-wide Reticulum instance that all users can share
+
 ## License
 
 This project is open-source and licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute it as you see fit.

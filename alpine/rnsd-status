@@ -5,4 +5,4 @@
 # Runs rnstatus to check rnsd status.
 #
 
-exec /opt/reticulum/bin/rnstatus --config /var/lib/reticulum/rnsd "$@"
+exec /opt/reticulum/bin/rnstatus --config /etc/reticulum "$@"

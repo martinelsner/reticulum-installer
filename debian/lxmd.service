@@ -1,13 +1,14 @@
 [Unit]
 Description=LXMF Router Daemon
 After=network.target rnsd.service
-Wants=network.target rnsd.service
+Requires=rnsd.service
+Wants=network.target
 
 [Service]
 Type=simple
 User=reticulum
 Group=reticulum
-ExecStart=/opt/reticulum/bin/lxmd --config /var/lib/reticulum/lxmd --rnsconfig /var/lib/reticulum/rnsd
+ExecStart=/opt/reticulum/bin/lxmd --config /var/lib/reticulum/lxmd --rnsconfig /etc/reticulum
 Restart=on-failure
 RestartSec=10s
 
