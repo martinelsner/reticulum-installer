@@ -2,6 +2,7 @@
 
 let
   cfg = config.services.reticulum;
+  python3Packages = pkgs.python3Packages or pkgs.python3.pkgs;
 
   rnsd-config = pkgs.writeText "rnsd.config" ''
     # Reticulum Network Stack configuration
@@ -110,7 +111,7 @@ in
         Type = "simple";
         User = "reticulum";
         Group = "reticulum";
-        ExecStart = "${pkgs.python3Packages.rns}/bin/rnsd --config /etc/reticulum/config";
+        ExecStart = "${python3Packages.rns}/bin/rnsd --config /etc/reticulum/config";
         Restart = "on-failure";
         RestartSec = "10s";
 
@@ -140,7 +141,7 @@ in
         Type = "simple";
         User = "reticulum";
         Group = "reticulum";
-        ExecStart = "${pkgs.python3Packages.lxmf}/bin/lxmd --config /var/lib/reticulum/lxmd --rnsconfig /etc/reticulum";
+        ExecStart = "${python3Packages.lxmf}/bin/lxmd --config /var/lib/reticulum/lxmd --rnsconfig /etc/reticulum";
         Restart = "on-failure";
         RestartSec = "10s";
 
