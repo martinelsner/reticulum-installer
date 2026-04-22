@@ -70,9 +70,7 @@ in
 
   config = lib.mkIf cfg.enable {
     users.groups = {
-      reticulum = {
-        gid = 987;
-      };
+      reticulum = {};
     };
 
     users.users.reticulum = {
@@ -82,7 +80,6 @@ in
       description = "Reticulum service user";
       home = "/var/lib/reticulum";
       createHome = true;
-      uid = 987;
     };
 
     systemd.tmpfiles.rules = [
