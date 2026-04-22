@@ -10,6 +10,7 @@ Choose your operating system to view detailed installation instructions:
 
 - [**Debian / Ubuntu / Linux Mint**](debian/README.md) (uses `systemd` and `apt`)
 - [**Alpine Linux**](alpine/README.md) (uses `OpenRC` and `apk`)
+- [**NixOS**](nixos/README.md) (uses NixOS module and `systemd`)
 
 ## Features
 - **Isolated:** Installs Python packages into a virtual environment at `/opt/reticulum`.
