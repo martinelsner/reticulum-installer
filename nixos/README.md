@@ -15,7 +15,7 @@ let
   };
 in
 {
-  imports = [ reticulum.nixos ];
+  imports = [ reticulum ];
   services.reticulum.enable = true;
 }
 ```
