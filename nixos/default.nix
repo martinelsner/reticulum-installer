@@ -67,7 +67,7 @@ in
         Type = "simple";
         User = "reticulum";
         Group = "reticulum";
-        ExecStart = "${python3Packages.rns}/bin/rnsd --config /etc/reticulum/config";
+        ExecStart = "${python3Packages.rns}/bin/rnsd --config /etc/reticulum";
         Restart = "on-failure";
         RestartSec = "10s";
 
