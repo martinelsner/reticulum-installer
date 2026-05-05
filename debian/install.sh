@@ -13,7 +13,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 CONFIG_DIR="/etc/reticulum"
-DATA_DIR="/var/lib/reticulum"
 
 # ---------- Preflight ----------
 
@@ -72,9 +71,8 @@ if ! id reticulum > /dev/null 2>&1; then
         --system \
         --gid reticulum \
         --groups dialout \
-        --home-dir "$DATA_DIR" \
-        --create-home \
         --shell /usr/sbin/nologin \
+        --no-create-home \
         reticulum
     echo "    Created user: reticulum (with dialout access for RNodes)"
 else
@@ -111,7 +109,7 @@ install_config() {
 }
 
 install_config "${SCRIPT_DIR}/../config/rnsd.config" "${CONFIG_DIR}/config"
-install_config "${SCRIPT_DIR}/../config/lxmd.config" "${DATA_DIR}/lxmd/config"
+install_config "${SCRIPT_DIR}/../config/lxmd.config" "/etc/lxmd/config"
 
 # Set permissions per SHARED.md for shared-instance mode:
 # - /etc/reticulum: root:reticulum 775 (group write for daemon, world read/execute for clients)
@@ -119,7 +117,7 @@ chown root:reticulum "${CONFIG_DIR}"
 chmod 775 "${CONFIG_DIR}"
 
 chmod 644 "${CONFIG_DIR}/config"
-chmod 644 "${DATA_DIR}/lxmd/config"
+chmod 644 "/etc/lxmd/config"
 
 # Writable subdirs owned by reticulum
 chown -R reticulum:reticulum "${CONFIG_DIR}/storage"
@@ -129,13 +127,10 @@ chmod 755 "${CONFIG_DIR}/storage"
 chmod -R o+rX "${CONFIG_DIR}/storage"
 
 # Ensure lxmd data directory is owned by reticulum and readable by all for client access
-chown -R reticulum:reticulum "${DATA_DIR}/lxmd"
-chmod -R o+rX "${DATA_DIR}/lxmd"
+chown -R reticulum:reticulum "/etc/lxmd"
+chmod -R o+rX "/etc/lxmd"
 
 echo "    Permissions set for shared-instance mode."
-
-# Keep the daemon's home directory traversable by all (shared-instance clients need access)
-chmod 755 "$DATA_DIR"
 
 # ---------- Systemd Units ----------
 
@@ -176,7 +171,7 @@ echo "    lxmd  -> systemctl status lxmd"
 echo ""
 echo "  Configuration:"
 echo "    rnsd  -> ${CONFIG_DIR}/config"
-echo "    lxmd  -> ${DATA_DIR}/lxmd/config"
+echo "    lxmd  -> /etc/lxmd/config"
 echo ""
 echo "  Logs:"
 echo "    journalctl -u rnsd -f"

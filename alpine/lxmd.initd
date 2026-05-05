@@ -3,7 +3,7 @@
 description="LXMF Router Daemon"
 
 command="/opt/reticulum/bin/lxmd"
-command_args="--service --config /var/lib/reticulum/lxmd --rnsconfig /etc/reticulum"
+command_args="--service --config /etc/lxmd --rnsconfig /etc/reticulum"
 command_user="reticulum:reticulum"
 command_background=true
 pidfile="/run/${RC_SVCNAME}.pid"

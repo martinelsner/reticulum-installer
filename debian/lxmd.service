@@ -8,7 +8,7 @@ Wants=network.target
 Type=simple
 User=reticulum
 Group=reticulum
-ExecStart=/opt/reticulum/bin/lxmd --config /var/lib/reticulum/lxmd --rnsconfig /etc/reticulum
+ExecStart=/opt/reticulum/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum
 Restart=on-failure
 RestartSec=10s
 
@@ -16,7 +16,7 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=full
 ProtectHome=yes
-ReadWritePaths=/var/lib/reticulum /etc/reticulum
+ReadWritePaths=/etc/lxmd /etc/reticulum
 ProtectKernelTunables=yes
 ProtectKernelModules=yes
 ProtectControlGroups=yes

@@ -20,7 +20,7 @@ Running the installer script will:
 1. Install required system packages (`python3`, `py3-pip`, `py3-virtualenv`).
 2. Build a virtual environment at `/opt/reticulum` and securely install `rns` and `lxmf`.
 3. Create the `reticulum` unprivileged system user.
-4. Establish `/etc/reticulum` for Reticulum config, `/var/lib/reticulum/lxmd` for LXMF config, and `/etc/reticulum/storage` for shared storage.
+4. Establish `/etc/reticulum` for Reticulum config, `/etc/lxmd` for LXMF config, and `/etc/reticulum/storage` for shared storage.
 5. Setup, enable, and start the OpenRC initialization scripts: `/etc/init.d/rnsd` and `/etc/init.d/lxmd`.
 6. Symlink the software and status wrappers to `/usr/local/bin` for system-wide accessibility.
 
@@ -31,8 +31,8 @@ Reticulum configuration is stored in `/etc/reticulum/`:
 
 Shared instance storage (identities, path tables, caches) is at `/etc/reticulum/storage/`.
 
-LXMF configuration and data are stored in `/var/lib/reticulum/lxmd/`:
-- **`lxmd` config**: `/var/lib/reticulum/lxmd/config`
+LXMF configuration and data are stored in `/etc/lxmd/`:
+- **`lxmd` config**: `/etc/lxmd/config`
 
 ## Managing the Service
 
@@ -85,6 +85,6 @@ sudo sh uninstall.sh
 
 To purge the deployment entirely (including identities, messages and databases), also run:
 ```bash
-sudo rm -rf /etc/reticulum /var/lib/reticulum
+sudo rm -rf /etc/reticulum /etc/lxmd
 sudo deluser reticulum
 ```

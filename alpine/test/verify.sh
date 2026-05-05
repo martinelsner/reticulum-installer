@@ -31,7 +31,6 @@ echo "--- User & Group ---"
 check "Group 'reticulum' exists"          getent group reticulum
 check "User 'reticulum' exists"           id reticulum
 check "User is in 'dialout' group"        sh -c "id -nG reticulum | grep -qw dialout || true"
-check "Home is /var/lib/reticulum"        test "$(getent passwd reticulum | cut -d: -f6)" = "/var/lib/reticulum"
 check "Shell is /sbin/nologin"            test "$(getent passwd reticulum | cut -d: -f7)" = "/sbin/nologin"
 
 # --- Binaries ---
@@ -46,9 +45,9 @@ check "lxmd-status is installed"          which lxmd-status
 echo ""
 echo "--- Configuration ---"
 check "rnsd config exists"                test -f /etc/reticulum/config
-check "lxmd config exists"                test -f /var/lib/reticulum/lxmd/config
+check "lxmd config exists"                test -f /etc/lxmd/config
 check "rnsd config has transport=yes"     grep -q "enable_transport = yes" /etc/reticulum/config
-check "lxmd config has node=yes"          grep -q "enable_node = yes" /var/lib/reticulum/lxmd/config
+check "lxmd config has node=yes"          grep -q "enable_node = yes" /etc/lxmd/config
 check "Storage dir owned by reticulum"    test "$(stat -c %U /etc/reticulum/storage)" = "reticulum"
 check "Storage dir readable by all"       test "$(stat -c %a /etc/reticulum/storage)" = "755" 2>/dev/null || test "$(stat -c %a /etc/reticulum/storage)" = "775"
 

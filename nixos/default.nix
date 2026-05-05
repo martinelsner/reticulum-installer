@@ -78,13 +78,10 @@ in
       group = "reticulum";
       groups = ["dialout"];
       description = "Reticulum service user";
-      home = "/var/lib/reticulum";
-      createHome = true;
     };
 
     systemd.tmpfiles.rules = [
-      "d /var/lib/reticulum 0750 root root -"
-      "d /var/lib/reticulum/lxmd 0750 reticulum reticulum -"
+      "d /etc/lxmd 0750 reticulum reticulum -"
     ];
 
     environment.etc = {
@@ -92,10 +89,11 @@ in
     };
 
     system.activationScripts.reticulumConfig = ''
-      if [ ! -f /var/lib/reticulum/lxmd/config ]; then
-        cp ${lxmd-config} /var/lib/reticulum/lxmd/config
-        chown reticulum:reticulum /var/lib/reticulum/lxmd/config
-        chmod 644 /var/lib/reticulum/lxmd/config
+      if [ ! -f /etc/lxmd/config ]; then
+        mkdir -p /etc/lxmd
+        cp ${lxmd-config} /etc/lxmd/config
+        chown reticulum:reticulum /etc/lxmd/config
+        chmod 644 /etc/lxmd/config
       fi
     '';
 
@@ -116,7 +114,7 @@ in
         PrivateTmp = true;
         ProtectSystem = "full";
         ProtectHome = true;
-        ReadWritePaths = "/var/lib/reticulum /etc/reticulum";
+        ReadWritePaths = "/etc/lxmd /etc/reticulum";
         ProtectKernelTunables = true;
         ProtectKernelModules = true;
         ProtectControlGroups = true;
@@ -138,7 +136,7 @@ in
         Type = "simple";
         User = "reticulum";
         Group = "reticulum";
-        ExecStart = "${python3Packages.lxmf}/bin/lxmd --config /var/lib/reticulum/lxmd --rnsconfig /etc/reticulum";
+        ExecStart = "${python3Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum";
         Restart = "on-failure";
         RestartSec = "10s";
 
@@ -146,7 +144,7 @@ in
         PrivateTmp = true;
         ProtectSystem = "full";
         ProtectHome = true;
-        ReadWritePaths = "/var/lib/reticulum /etc/reticulum";
+        ReadWritePaths = "/etc/lxmd /etc/reticulum";
         ProtectKernelTunables = true;
         ProtectKernelModules = true;
         ProtectControlGroups = true;
