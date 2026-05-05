@@ -44,29 +44,31 @@ in
     environment.systemPackages = [ rnsd-status lxmd-status ];
 
     systemd.tmpfiles.rules = [
-      "d /etc/reticulum 0755 root reticulum -"
-      "d /etc/lxmd 0755 root reticulum -"
+      "d /var/lib/reticulum 0755 root reticulum -"
+      "d /var/lib/lxmd 0755 root reticulum -"
     ];
 
-    environment.etc = {
-      "reticulum/config".source = "${rnsd-config}";
-    };
+    environment.etc."reticulum".source = "/var/lib/reticulum";
+    environment.etc."lxmd".source = "/var/lib/lxmd";
 
     system.activationScripts.reticulumConfig = ''
-      if [ ! -f /etc/lxmd/config ]; then
-        mkdir -p /etc/lxmd
-        cp ${lxmd-config} /etc/lxmd/config
+      if [ ! -f /var/lib/reticulum ]; then
+        cp ${rnsd-config} /var/lib/reticulum
+        chown reticulum:reticulum /var/lib/reticulum
+        chmod 644 /var/lib/reticulum
       fi
-      chown reticulum:reticulum /etc/lxmd/config
-      chmod 644 /etc/lxmd/config
 
-      chown -R reticulum:reticulum /etc/lxmd
-      chmod -R o+rX /etc/lxmd
+      if [ ! -f /var/lib/lxmd ]; then
+        mkdir -p /var/lib/lxmd
+        cp ${lxmd-config} /var/lib/lxmd
+        chown reticulum:reticulum /var/lib/lxmd
+        chmod 644 /var/lib/lxmd
+      fi
 
-      mkdir -p /etc/reticulum/storage
-      chown -R reticulum:reticulum /etc/reticulum/storage
-      chmod -R o+rX /etc/reticulum/storage
-      chmod 755 /etc/reticulum/storage
+      mkdir -p /var/lib/reticulum/storage
+      chown -R reticulum:reticulum /var/lib/reticulum/storage
+      chmod -R o+rX /var/lib/reticulum/storage
+      chmod 755 /var/lib/reticulum/storage
     '';
 
     systemd.services.rnsd = {
