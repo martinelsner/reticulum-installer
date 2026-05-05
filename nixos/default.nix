@@ -81,12 +81,13 @@ in
   config = lib.mkIf cfg.enable {
     users.groups = {
       reticulum = {};
+      dialout = {};
     };
 
     users.users.reticulum = {
       isSystemUser = true;
       group = "reticulum";
-      groups = ["dialout"];
+      extraGroups = ["dialout"];
       description = "Reticulum service user";
     };
 
