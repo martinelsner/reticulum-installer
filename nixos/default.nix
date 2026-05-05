@@ -53,14 +53,14 @@ in
 
     system.activationScripts.reticulumConfig = ''
       if [ ! -f /var/lib/reticulum ]; then
-        cp ${rnsd-config} /var/lib/reticulum
+        cp --no-clobber ${rnsd-config} /var/lib/reticulum/config
         chown reticulum:reticulum /var/lib/reticulum
         chmod 644 /var/lib/reticulum
       fi
 
       if [ ! -f /var/lib/lxmd ]; then
         mkdir -p /var/lib/lxmd
-        cp ${lxmd-config} /var/lib/lxmd
+        cp --no-clobber ${lxmd-config} /var/lib/lxmd/config
         chown reticulum:reticulum /var/lib/lxmd
         chmod 644 /var/lib/lxmd
       fi
