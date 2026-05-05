@@ -116,7 +116,7 @@ in
         PrivateTmp = true;
         ProtectSystem = "full";
         ProtectHome = true;
-        ReadWritePaths = "/var/lib/reticulum";
+        ReadWritePaths = "/var/lib/reticulum /etc/reticulum";
         ProtectKernelTunables = true;
         ProtectKernelModules = true;
         ProtectControlGroups = true;
@@ -146,7 +146,7 @@ in
         PrivateTmp = true;
         ProtectSystem = "full";
         ProtectHome = true;
-        ReadWritePaths = "/var/lib/reticulum";
+        ReadWritePaths = "/var/lib/reticulum /etc/reticulum";
         ProtectKernelTunables = true;
         ProtectKernelModules = true;
         ProtectControlGroups = true;

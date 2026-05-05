@@ -60,6 +60,8 @@ check "rnsd.service file installed"       test -f /etc/systemd/system/rnsd.servi
 check "lxmd.service file installed"       test -f /etc/systemd/system/lxmd.service
 check "rnsd.service is enabled"           systemctl is-enabled rnsd.service
 check "lxmd.service is enabled"           systemctl is-enabled lxmd.service
+check "rnsd.service has /etc/reticulum ReadWritePaths"  grep -q "ReadWritePaths=/etc/reticulum" /etc/systemd/system/rnsd.service
+check "lxmd.service has /etc/reticulum ReadWritePaths"  grep -q "ReadWritePaths=.*/etc/reticulum" /etc/systemd/system/lxmd.service
 
 # --- Service Status ---
 echo ""
