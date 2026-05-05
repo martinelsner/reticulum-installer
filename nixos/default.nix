@@ -2,19 +2,19 @@
 
 let
   cfg = config.services.reticulum;
-  inherit (pkgs) python3Packages;
+  inherit (pkgs) python314Packages;
 
   rnsd-config = pkgs.writeText "rnsd.config" (builtins.readFile ../config/rnsd.config);
   lxmd-config = pkgs.writeText "lxmd.config" (builtins.readFile ../config/lxmd.config);
 
   rnsd-status = pkgs.writeScriptBin "rnsd-status" ''
     #!${pkgs.bash}/bin/bash
-    exec ${python3Packages.rns}/bin/rnstatus --config /etc/reticulum "$@"
+    exec ${python314Packages.rns}/bin/rnstatus --config /etc/reticulum "$@"
   '';
 
   lxmd-status = pkgs.writeScriptBin "lxmd-status" ''
     #!${pkgs.bash}/bin/bash
-    exec ${python3Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum --status "$@"
+    exec ${python314Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum --status "$@"
   '';
 in
 {
@@ -46,7 +46,7 @@ in
     environment.etc."reticulum".source = "/var/lib/reticulum";
     environment.etc."lxmd".source = "/var/lib/lxmd";
 
-system.activationScripts.reticulumConfig = ''
+    system.activationScripts.reticulumConfig = ''
       mkdir -p /var/lib/reticulum /var/lib/lxmd
       cp --no-clobber ${rnsd-config} /var/lib/reticulum/config
       cp --no-clobber ${lxmd-config} /var/lib/lxmd/config
@@ -69,7 +69,7 @@ system.activationScripts.reticulumConfig = ''
         Type = "simple";
         User = "reticulum";
         Group = "reticulum";
-        ExecStart = "${python3Packages.rns}/bin/rnsd --config /etc/reticulum";
+        ExecStart = "${python314Packages.rns}/bin/rnsd --config /etc/reticulum";
         Restart = "on-failure";
         RestartSec = "10s";
 
@@ -99,7 +99,7 @@ system.activationScripts.reticulumConfig = ''
         Type = "simple";
         User = "reticulum";
         Group = "reticulum";
-        ExecStart = "${python3Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum";
+        ExecStart = "${python314Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum";
         Restart = "on-failure";
         RestartSec = "10s";
 
