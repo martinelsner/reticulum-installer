@@ -4,58 +4,8 @@ let
   cfg = config.services.reticulum;
   python3Packages = pkgs.python3Packages or pkgs.python3.pkgs;
 
-  rnsd-config = pkgs.writeText "rnsd.config" ''
-    # Reticulum Network Stack configuration
-
-    [reticulum]
-
-      enable_transport = yes
-      share_instance = yes
-      instance_name = default
-
-
-    [logging]
-
-      loglevel = 4
-
-
-    [interfaces]
-
-      [[Default Interface]]
-        type = AutoInterface
-        interface_enabled = True
-
-      [[TCP Server Interface]]
-        type = TCPServerInterface
-        interface_enabled = False
-        listen_ip = 0.0.0.0
-        listen_port = 4242
-  '';
-
-  lxmd-config = pkgs.writeText "lxmd.config" ''
-    # LXMF Daemon configuration — Propagation Node
-
-    [propagation]
-
-      enable_node = yes
-      announce_at_start = yes
-      announce_interval = 360
-      autopeer = yes
-      autopeer_maxdepth = 6
-      auth_required = no
-
-
-    [lxmf]
-
-      display_name = LXMF Propagation Node
-      announce_at_start = yes
-      delivery_transfer_max_accepted_size = 1000
-
-
-    [logging]
-
-      loglevel = 4
-  '';
+  rnsd-config = pkgs.writeText "rnsd.config" (builtins.readFile ../config/rnsd.config);
+  lxmd-config = pkgs.writeText "lxmd.config" (builtins.readFile ../config/lxmd.config);
 in
 {
   options = with lib; {
