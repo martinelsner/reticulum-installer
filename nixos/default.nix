@@ -92,9 +92,9 @@ in
       if [ ! -f /etc/lxmd/config ]; then
         mkdir -p /etc/lxmd
         cp ${lxmd-config} /etc/lxmd/config
-        chown reticulum:reticulum /etc/lxmd/config
-        chmod 644 /etc/lxmd/config
       fi
+      chown reticulum:reticulum /etc/lxmd/config
+      chmod 644 /etc/lxmd/config
     '';
 
     systemd.services.rnsd = {
