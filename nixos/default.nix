@@ -44,7 +44,8 @@ in
     environment.systemPackages = [ rnsd-status lxmd-status ];
 
     systemd.tmpfiles.rules = [
-      "d /etc/lxmd 0750 reticulum reticulum -"
+      "d /etc/reticulum 0755 root reticulum -"
+      "d /etc/lxmd 0755 root reticulum -"
     ];
 
     environment.etc = {
@@ -58,6 +59,14 @@ in
       fi
       chown reticulum:reticulum /etc/lxmd/config
       chmod 644 /etc/lxmd/config
+
+      chown -R reticulum:reticulum /etc/lxmd
+      chmod -R o+rX /etc/lxmd
+
+      mkdir -p /etc/reticulum/storage
+      chown -R reticulum:reticulum /etc/reticulum/storage
+      chmod -R o+rX /etc/reticulum/storage
+      chmod 755 /etc/reticulum/storage
     '';
 
     systemd.services.rnsd = {
