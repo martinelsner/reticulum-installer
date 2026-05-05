@@ -65,6 +65,16 @@ in
         default = false;
         description = "Enable Reticulum and LXMF services";
       };
+      rnsdConfigDir = mkOption {
+        type = types.str;
+        default = "/etc/reticulum";
+        description = "Directory for rnsd configuration";
+      };
+      lxmdConfigDir = mkOption {
+        type = types.str;
+        default = "/etc/lxmd";
+        description = "Directory for lxmd configuration";
+      };
     };
   };
 
