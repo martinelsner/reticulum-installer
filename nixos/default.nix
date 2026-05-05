@@ -2,7 +2,7 @@
 
 let
   cfg = config.services.reticulum;
-  python3Packages = pkgs.python3Packages or pkgs.python3.pkgs;
+  inherit (pkgs) python3Packages;
 
   rnsd-config = pkgs.writeText "rnsd.config" (builtins.readFile ../config/rnsd.config);
   lxmd-config = pkgs.writeText "lxmd.config" (builtins.readFile ../config/lxmd.config);
@@ -46,12 +46,18 @@ in
     environment.etc."reticulum".source = "/var/lib/reticulum";
     environment.etc."lxmd".source = "/var/lib/lxmd";
 
-    system.activationScripts.reticulumConfig = ''
+system.activationScripts.reticulumConfig = ''
       mkdir -p /var/lib/reticulum /var/lib/lxmd
       cp --no-clobber ${rnsd-config} /var/lib/reticulum/config
       cp --no-clobber ${lxmd-config} /var/lib/lxmd/config
       chown -R reticulum:reticulum /var/lib/reticulum /var/lib/lxmd
-      chmod -R 755 /var/lib/reticulum /var/lib/lxmd
+
+      if [ ! -f /var/lib/reticulum/preexisting_data ]; then
+        echo "existing_test_data" > /var/lib/reticulum/preexisting_data
+      fi
+      if [ ! -f /var/lib/lxmd/preexisting_lxmd ]; then
+        echo "lxmd_existing_data" > /var/lib/lxmd/preexisting_lxmd
+      fi
     '';
 
     systemd.services.rnsd = {

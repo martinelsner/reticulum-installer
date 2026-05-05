@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 #
-# Test runner — evaluates the NixOS module and runs verification on the host.
+# Test runner — builds and runs the NixOS installer test in a QEMU VM.
+#
+# Prerequisites on Ubuntu:
+#   sudo apt install qemu-system-x86 kvm
 #
 # Usage: bash test/run.sh
 #
@@ -13,9 +16,22 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 echo "==> Reticulum Installer Test (NixOS)"
 echo ""
 
-# --- Evaluate module and verify ---
-echo "--- Evaluating module and running verification ---"
-bash "${SCRIPT_DIR}/rebuild.sh"
+# --- Run NixOS test ---
+echo "--- Building and running NixOS VM test ---"
+nix-build "${PROJECT_DIR}/nixos/test/default.nix"
+
 RESULT=$?
+
+if [[ $RESULT -eq 0 ]]; then
+    echo ""
+    echo "========================================"
+    echo "  ALL TESTS PASSED"
+    echo "========================================"
+else
+    echo ""
+    echo "========================================"
+    echo "  TEST FAILED"
+    echo "========================================"
+fi
 
 exit $RESULT
