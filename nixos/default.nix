@@ -51,6 +51,7 @@ in
       cp --no-clobber ${rnsd-config} /var/lib/reticulum/config
       cp --no-clobber ${lxmd-config} /var/lib/lxmd/config
       chown -R reticulum:reticulum /var/lib/reticulum /var/lib/lxmd
+      chmod -R 755 /var/lib/reticulum /var/lib/lxmd
     '';
 
     systemd.services.rnsd = {
