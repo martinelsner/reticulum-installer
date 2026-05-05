@@ -3,7 +3,6 @@
 let
   pkgs = import <nixpkgs> { inherit system; };
   lib = pkgs.lib;
-  project = /home/martin/programming/personal/reticulum-installer;
 in
 
 pkgs.testers.nixosTest {
@@ -12,7 +11,7 @@ pkgs.testers.nixosTest {
   nodes = {
     machine = { config, pkgs, ... }: {
       imports = [
-        "${project}/nixos/default.nix"
+        ../default.nix
       ];
 
       services.reticulum.enable = true;
