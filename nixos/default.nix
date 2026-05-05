@@ -6,6 +6,16 @@ let
 
   rnsd-config = pkgs.writeText "rnsd.config" (builtins.readFile ../config/rnsd.config);
   lxmd-config = pkgs.writeText "lxmd.config" (builtins.readFile ../config/lxmd.config);
+
+  rnsd-status = pkgs.writeScriptBin "rnsd-status" ''
+    #!${pkgs.bash}/bin/bash
+    exec ${python3Packages.rns}/bin/rnstatus --config /etc/reticulum "$@"
+  '';
+
+  lxmd-status = pkgs.writeScriptBin "lxmd-status" ''
+    #!${pkgs.bash}/bin/bash
+    exec ${python3Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum --status "$@"
+  '';
 in
 {
   options = with lib; {
@@ -14,16 +24,6 @@ in
         type = types.bool;
         default = false;
         description = "Enable Reticulum and LXMF services";
-      };
-      rnsdConfigDir = mkOption {
-        type = types.str;
-        default = "/etc/reticulum";
-        description = "Directory for rnsd configuration";
-      };
-      lxmdConfigDir = mkOption {
-        type = types.str;
-        default = "/etc/lxmd";
-        description = "Directory for lxmd configuration";
       };
     };
   };
@@ -40,6 +40,8 @@ in
       extraGroups = ["dialout"];
       description = "Reticulum service user";
     };
+
+    environment.systemPackages = [ rnsd-status lxmd-status ];
 
     systemd.tmpfiles.rules = [
       "d /etc/lxmd 0750 reticulum reticulum -"
