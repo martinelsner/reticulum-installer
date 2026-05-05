@@ -43,32 +43,14 @@ in
 
     environment.systemPackages = [ rnsd-status lxmd-status ];
 
-    systemd.tmpfiles.rules = [
-      "d /var/lib/reticulum 0755 root reticulum -"
-      "d /var/lib/lxmd 0755 root reticulum -"
-    ];
-
     environment.etc."reticulum".source = "/var/lib/reticulum";
     environment.etc."lxmd".source = "/var/lib/lxmd";
 
     system.activationScripts.reticulumConfig = ''
-      if [ ! -f /var/lib/reticulum ]; then
-        cp --no-clobber ${rnsd-config} /var/lib/reticulum/config
-        chown reticulum:reticulum /var/lib/reticulum
-        chmod 644 /var/lib/reticulum
-      fi
-
-      if [ ! -f /var/lib/lxmd ]; then
-        mkdir -p /var/lib/lxmd
-        cp --no-clobber ${lxmd-config} /var/lib/lxmd/config
-        chown reticulum:reticulum /var/lib/lxmd
-        chmod 644 /var/lib/lxmd
-      fi
-
-      mkdir -p /var/lib/reticulum/storage
-      chown -R reticulum:reticulum /var/lib/reticulum/storage
-      chmod -R o+rX /var/lib/reticulum/storage
-      chmod 775 /var/lib/reticulum/storage
+      mkdir -p /var/lib/reticulum /var/lib/lxmd
+      cp --no-clobber ${rnsd-config} /var/lib/reticulum/config
+      cp --no-clobber ${lxmd-config} /var/lib/lxmd/config
+      chown -R reticulum:reticulum /var/lib/reticulum /var/lib/lxmd
     '';
 
     systemd.services.rnsd = {
