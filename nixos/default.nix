@@ -68,7 +68,7 @@ in
       mkdir -p /var/lib/reticulum/storage
       chown -R reticulum:reticulum /var/lib/reticulum/storage
       chmod -R o+rX /var/lib/reticulum/storage
-      chmod 755 /var/lib/reticulum/storage
+      chmod 775 /var/lib/reticulum/storage
     '';
 
     systemd.services.rnsd = {
