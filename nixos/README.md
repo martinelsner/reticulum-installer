@@ -6,9 +6,12 @@ This module installs Reticulum Network Stack (`rnsd`) and LXMF Router (`lxmd`) a
 
 ```nix
 let
-  unstable = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {};
+  unstable = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {
+    config = { allowUnfree = true; };
+  };
   reticulum = import (builtins.fetchTarball "https://codeberg.org/melsner/reticulum-installer/archive/main.tar.gz") {
     pkgs = unstable;
+    lib = unstable.lib;
   };
 in
 {
