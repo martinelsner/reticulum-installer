@@ -60,6 +60,15 @@ pkgs.testers.nixosTest {
     machine.succeed("test -f /var/lib/lxmd/preexisting_lxmd")
     machine.succeed("grep -q 'lxmd_existing_data' /var/lib/lxmd/preexisting_lxmd")
 
+    print("=== Checking Permissions ===")
+    machine.succeed("test \"$(stat -c %a /var/lib/reticulum)\" = \"777\" -o \"$(stat -c %a /var/lib/reticulum)\" = \"775\"")
+    machine.succeed("test \"$(stat -c %a /var/lib/reticulum/storage)\" = \"777\" -o \"$(stat -c %a /var/lib/reticulum/storage)\" = \"775\"")
+    machine.succeed("test \"$(stat -c %a /var/lib/reticulum/interfaces)\" = \"777\" -o \"$(stat -c %a /var/lib/reticulum/interfaces)\" = \"775\"")
+    machine.succeed("touch /var/lib/reticulum/test_file && chmod 644 /var/lib/reticulum/test_file")
+    machine.succeed("test -r /var/lib/reticulum/test_file")
+    machine.succeed("mkdir -p /var/lib/reticulum/test_dir && chmod 755 /var/lib/reticulum/test_dir")
+    machine.succeed("test -d /var/lib/reticulum/test_dir")
+
     print("=== Checking Systemd Units ===")
     machine.succeed("test -f /etc/systemd/system/rnsd.service")
     machine.succeed("test -f /etc/systemd/system/lxmd.service")

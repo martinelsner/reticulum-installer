@@ -148,18 +148,27 @@ sudo useradd -r -s /usr/sbin/nologin reticulum
 
 ### 3. Set ownership and permissions
 
+All users on the system need full access to `/etc/reticulum` — read, write, and traverse. Running apps create files and subdirectories that must also be automatically accessible to everyone.
+
 ```bash
-# The reticulum user owns the storage directory and reads/writes it
-sudo chown -R reticulum:reticulum /etc/reticulum/storage
+# /etc/reticulum and everything in it is fully accessible to everyone
+# Capital X = execute only on dirs, not on files
+sudo chmod -R ugo+rwX /etc/reticulum
 
-# Storage only needs to be readable by other users; rnsd does all writes
-sudo chmod -R o+rX /etc/reticulum/storage
+# ACLs ensure new files/dirs inherit rwX for all automatically
+sudo setfacl -R -m u::rwX /etc/reticulum
+sudo setfacl -R -d -m u::rwX /etc/reticulum
+sudo setfacl -R -d -m o::rwX /etc/reticulum
+```
 
-# The config file is world-readable
+If `setfacl` is unavailable, the `chmod 777` achieves the same result (new files inherit based on `umask`).
+
+The config file is world-readable:
+```bash
 sudo chmod 644 /etc/reticulum/config
 ```
 
-On Linux, the AF_UNIX abstract socket gives all local users access to the data socket regardless of file permissions. No group setup is needed.
+On Linux, the AF_UNIX abstract socket gives all local users access to the data socket regardless of file permissions.
 
 ### 4. Install and configure the rnsd systemd service
 
@@ -264,5 +273,5 @@ loglevel = 4                  # 0=critical .. 7=extreme
 | `rnstatus` hangs or `AuthenticationError` | Stray Python process grabbed the socket | Kill stray processes, restart rnsd |
 | `rnstatus` shows no interfaces | User's process became the master instead of rnsd | Kill stray Python processes, restart rnsd |
 | `rnsd` fails to bind socket | Another `rnsd` already running | `systemctl stop rnsd` first |
-| Users get "Permission denied" on storage | Storage not world-readable | `sudo chmod -R o+rX /etc/reticulum/storage` |
+| Users get "Permission denied" on storage | Storage not fully accessible to all | `sudo chmod -R 777 /etc/reticulum` |
 | Programs open their own interfaces instead of connecting to rnsd | `share_instance = No` in config | Ensure it is `Yes` |

@@ -107,20 +107,15 @@ install_config() {
 install_config "${SCRIPT_DIR}/../config/rnsd.config" "${CONFIG_DIR}/config"
 install_config "${SCRIPT_DIR}/../config/lxmd.config" "/etc/lxmd/config"
 
-# Set permissions per SHARED.md with write for daemon:
-# - /etc/reticulum: root:reticulum 775 (group write for daemon, others traverse/read)
-chown root:reticulum "${CONFIG_DIR}"
-chmod 775 "${CONFIG_DIR}"
+# Ensure /etc/reticulum is fully accessible by all users.
+# ACLs ensure new files/dirs automatically inherit rwX for all.
+setfacl -R -m u::rwX /etc/reticulum 2>/dev/null || chmod -R ugo+rwX /etc/reticulum
+setfacl -R -d -m u::rwX /etc/reticulum 2>/dev/null || true
+setfacl -R -d -m o::rwX /etc/reticulum 2>/dev/null || true
 
-chmod 644 "${CONFIG_DIR}/config"
-chmod 644 "/etc/lxmd/config"
-
-# Writable subdirs owned by reticulum
-chown -R reticulum:reticulum "${CONFIG_DIR}/storage"
-chown reticulum:reticulum "${CONFIG_DIR}/interfaces"
-# Ensure storage is world-readable (dirs 755, files get o+r via umask or explicit)
-chmod 755 "${CONFIG_DIR}/storage"
-chmod -R o+rX "${CONFIG_DIR}/storage"
+chmod ugo+rwX "${CONFIG_DIR}"
+chmod ugo+rwX "${CONFIG_DIR}/storage"
+chmod ugo+rwX "${CONFIG_DIR}/interfaces"
 
 # Ensure lxmd data directory is owned by reticulum
 chown -R reticulum:reticulum "/etc/lxmd"

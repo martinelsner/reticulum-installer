@@ -9,15 +9,18 @@
 
 set -euo pipefail
 
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+cd "${PROJECT_DIR}/nixos/test"
 
 echo "==> Reticulum Installer Test (NixOS)"
 echo ""
 
 # --- Run NixOS test ---
 echo "--- Building and running NixOS VM test ---"
-nix-build "${PROJECT_DIR}/nixos/test/default.nix"
+nix-build "default.nix"
 
 RESULT=$?
 

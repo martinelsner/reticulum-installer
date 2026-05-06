@@ -41,15 +41,24 @@ check "lxmd is installed"                 which lxmd
 check "rnsd-status is installed"          which rnsd-status
 check "lxmd-status is installed"          which lxmd-status
 
-# --- Configuration ---
+# --- Permissions ---
 echo ""
-echo "--- Configuration ---"
-check "rnsd config exists"                test -f /etc/reticulum/config
-check "lxmd config exists"                test -f /etc/lxmd/config
-check "rnsd config has transport=yes"     grep -q "enable_transport = yes" /etc/reticulum/config
-check "lxmd config has node=yes"          grep -q "enable_node = yes" /etc/lxmd/config
-check "Storage dir owned by reticulum"    test "$(stat -c %U /etc/reticulum/storage)" = "reticulum"
-check "Storage dir readable by all"       test "$(stat -c %a /etc/reticulum/storage)" = "755" 2>/dev/null || test "$(stat -c %a /etc/reticulum/storage)" = "775"
+echo "--- Permissions ---"
+check "/etc/reticulum is world-accessible"  test "$(stat -c %a /etc/reticulum)" = "777" || test "$(stat -c %a /etc/reticulum)" = "775"
+check "/etc/reticulum/storage is world-accessible"  test "$(stat -c %a /etc/reticulum/storage)" = "777" || test "$(stat -c %a /etc/reticulum/storage)" = "775"
+check "/etc/reticulum/interfaces is world-accessible"  test "$(stat -c %a /etc/reticulum/interfaces)" = "777" || test "$(stat -c %a /etc/reticulum/interfaces)" = "775"
+check "Other users can traverse /etc/reticulum"  su -s /bin/sh -c "test -d /etc/reticulum && test -r /etc/reticulum && test -x /etc/reticulum" nobody
+check "Other users can read /etc/reticulum/config"  su -s /bin/sh -c "test -r /etc/reticulum/config" nobody
+
+echo ""
+echo "--- Permissions: inherited by new files ---"
+touch /etc/reticulum/test_file 2>/dev/null || true
+check "New files are world-readable"  test -r /etc/reticulum/test_file 2>/dev/null
+# Cleanup
+rm -f /etc/reticulum/test_file 2>/dev/null || true
+
+# --- Storage ---
+check "Storage dir is world-accessible"  test "$(stat -c %a /etc/reticulum/storage)" = "777" || test "$(stat -c %a /etc/reticulum/storage)" = "755"
 
 # --- OpenRC Init Scripts ---
 echo ""

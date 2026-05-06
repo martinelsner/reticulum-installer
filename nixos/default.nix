@@ -46,10 +46,23 @@ in
     environment.etc."lxmd".source = "/var/lib/lxmd";
 
     system.activationScripts.reticulumConfig = ''
-      mkdir -p /var/lib/reticulum /var/lib/lxmd
+      mkdir -p /var/lib/reticulum/storage /var/lib/reticulum/interfaces /var/lib/lxmd
       cp --no-clobber ${rnsd-config} /var/lib/reticulum/config
       cp --no-clobber ${lxmd-config} /var/lib/lxmd/config
       chown -R reticulum:reticulum /var/lib/reticulum /var/lib/lxmd
+
+      # Ensure /etc/reticulum and /var/lib/reticulum are fully accessible by all users.
+      # Capital X = execute only on dirs, not on files.
+      # ACLs ensure new files/dirs automatically inherit rwX for all.
+      setfacl -R -m u::rwX /var/lib/reticulum 2>/dev/null || chmod -R ugo+rwX /var/lib/reticulum
+      setfacl -R -d -m u::rwX /var/lib/reticulum 2>/dev/null || true
+      setfacl -R -d -m o::rwX /var/lib/reticulum 2>/dev/null || true
+
+      # Ensure /etc/lxmd is world-readable but not world-writable
+      setfacl -R -m u::r-x /var/lib/lxmd 2>/dev/null || true
+      setfacl -R -d -m u::r-x /var/lib/lxmd 2>/dev/null || true
+      setfacl -R -m o::r-x /var/lib/lxmd 2>/dev/null || true
+      setfacl -R -d -m o::r-x /var/lib/lxmd 2>/dev/null || true
 
       if [ ! -f /var/lib/reticulum/preexisting_data ]; then
         echo "existing_test_data" > /var/lib/reticulum/preexisting_data

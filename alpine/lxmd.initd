@@ -13,5 +13,5 @@ depend() {
 }
 
 start_pre() {
-    checkpath --directory --owner reticulum:reticulum --mode 0755 /etc/reticulum/storage
+    checkpath --directory --owner root:root --mode 0777 /etc/reticulum/storage
 }
