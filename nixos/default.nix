@@ -1,20 +1,9 @@
 { config, lib, pkgs, ... }:
 
 let
-  cfg = config.services.reticulum;
-
-  rnsd-config = pkgs.writeText "rnsd.config" (builtins.readFile ../config/rnsd.config);
-  lxmd-config = pkgs.writeText "lxmd.config" (builtins.readFile ../config/lxmd.config);
-
-  rnsd-status = pkgs.writeScriptBin "rnsd-status" ''
-    #!${pkgs.bash}/bin/bash
-    exec ${pkgs.python313Packages.rns}/bin/rnstatus --config /etc/reticulum "$@"
-  '';
-
-  lxmd-status = pkgs.writeScriptBin "lxmd-status" ''
-    #!${pkgs.bash}/bin/bash
-    exec ${pkgs.python313Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum --status "$@"
-  '';
+  cfg.rnsd = config.services.rnsd;
+  cfg.lxmd = config.services.lxmd;
+  sharedCfg = config.services.reticulum;
 in
 {
   options = with lib; {
@@ -22,12 +11,40 @@ in
       enable = mkOption {
         type = types.bool;
         default = false;
-        description = "Enable Reticulum and LXMF services";
+        description = "Enable shared configuration for Reticulum and LXMF";
+      };
+    };
+
+    services.rnsd = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable Reticulum Network Stack Daemon";
+      };
+
+      package = mkOption {
+        type = types.package;
+        default = pkgs.python313Packages.rns;
+        description = "Reticulum package to use";
+      };
+    };
+
+    services.lxmd = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable LXMF Router Daemon";
+      };
+
+      package = mkOption {
+        type = types.package;
+        default = pkgs.python313Packages.lxmf;
+        description = "LXMF package to use";
       };
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (sharedCfg.enable || cfg.rnsd.enable || cfg.lxmd.enable) {
     users.groups = {
       reticulum = {};
       dialout = {};
@@ -40,25 +57,19 @@ in
       description = "Reticulum service user";
     };
 
-    environment.systemPackages = [ rnsd-status lxmd-status ];
-
     environment.etc."reticulum".source = "/var/lib/reticulum";
     environment.etc."lxmd".source = "/var/lib/lxmd";
 
     system.activationScripts.reticulumConfig = ''
       mkdir -p /var/lib/reticulum/storage /var/lib/reticulum/interfaces /var/lib/lxmd
-      cp --no-clobber ${rnsd-config} /var/lib/reticulum/config
-      cp --no-clobber ${lxmd-config} /var/lib/lxmd/config
+      cp --no-clobber ${pkgs.writeText "rnsd.config" (builtins.readFile ../config/rnsd.config)} /var/lib/reticulum/config
+      cp --no-clobber ${pkgs.writeText "lxmd.config" (builtins.readFile ../config/lxmd.config)} /var/lib/lxmd/config
       chown -R reticulum:reticulum /var/lib/reticulum /var/lib/lxmd
 
-      # Ensure /etc/reticulum and /var/lib/reticulum are fully accessible by all users.
-      # Capital X = execute only on dirs, not on files.
-      # ACLs ensure new files/dirs automatically inherit rwX for all.
       setfacl -R -m u::rwX /var/lib/reticulum 2>/dev/null || chmod -R ugo+rwX /var/lib/reticulum
       setfacl -R -d -m u::rwX /var/lib/reticulum 2>/dev/null || true
       setfacl -R -d -m o::rwX /var/lib/reticulum 2>/dev/null || true
 
-      # Ensure /etc/lxmd is world-readable but not world-writable
       setfacl -R -m u::r-x /var/lib/lxmd 2>/dev/null || true
       setfacl -R -d -m u::r-x /var/lib/lxmd 2>/dev/null || true
       setfacl -R -m o::r-x /var/lib/lxmd 2>/dev/null || true
@@ -72,7 +83,7 @@ in
       fi
     '';
 
-    systemd.services.rnsd = {
+    systemd.services.rnsd = lib.mkIf cfg.rnsd.enable {
       description = "Reticulum Network Stack Daemon";
       after = ["network.target"];
       wantedBy = ["multi-user.target"];
@@ -81,7 +92,7 @@ in
         Type = "simple";
         User = "reticulum";
         Group = "reticulum";
-        ExecStart = "${pkgs.python313Packages.rns}/bin/rnsd --config /etc/reticulum";
+        ExecStart = "${cfg.rnsd.package}/bin/rnsd --config /etc/reticulum";
         Restart = "on-failure";
         RestartSec = "10s";
 
@@ -101,7 +112,7 @@ in
       };
     };
 
-    systemd.services.lxmd = {
+    systemd.services.lxmd = lib.mkIf cfg.lxmd.enable {
       description = "LXMF Router Daemon";
       after = ["network.target" "rnsd.service"];
       wants = ["rnsd.service"];
@@ -111,7 +122,7 @@ in
         Type = "simple";
         User = "reticulum";
         Group = "reticulum";
-        ExecStart = "${pkgs.python313Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum";
+        ExecStart = "${cfg.lxmd.package}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum";
         Restart = "on-failure";
         RestartSec = "10s";
 
@@ -131,7 +142,16 @@ in
       };
     };
 
-    systemd.services.rnsd.enable = true;
-    systemd.services.lxmd.enable = true;
+    environment.systemPackages = lib.optionals cfg.rnsd.enable [
+      (pkgs.writeScriptBin "rnsd-status" ''
+        #!${pkgs.bash}/bin/bash
+        exec ${cfg.rnsd.package}/bin/rnstatus --config /etc/reticulum "$@"
+      '')
+    ] ++ lib.optionals cfg.lxmd.enable [
+      (pkgs.writeScriptBin "lxmd-status" ''
+        #!${pkgs.bash}/bin/bash
+        exec ${cfg.lxmd.package}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum --status "$@"
+      '')
+    ];
   };
 }

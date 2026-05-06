@@ -6,17 +6,30 @@ This module installs Reticulum Network Stack (`rnsd`) and LXMF Router (`lxmd`) a
 
 ```nix
 let
+  reticulum-src = builtins.fetchTarball "https://codeberg.org/melsner/reticulum-installer/archive/main.tar.gz";
+in
+{
+  imports = [ "${reticulum-src}/nixos" ];
+  services.rnsd.enable = true;
+  services.lxmd.enable = true;
+}
+```
+
+### Using packages from unstable
+
+```nix
+let
   unstable = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {
     config = { allowUnfree = true; };
   };
-  reticulum = import (builtins.fetchTarball "https://codeberg.org/melsner/reticulum-installer/archive/main.tar.gz") {
-    pkgs = unstable;
-    lib = unstable.lib;
-  };
+  reticulum-src = builtins.fetchTarball "https://codeberg.org/melsner/reticulum-installer/archive/main.tar.gz";
 in
 {
-  imports = [ reticulum ];
-  services.reticulum.enable = true;
+  imports = [ "${reticulum-src}/nixos" ];
+  services.rnsd.enable = true;
+  services.rnsd.package = unstable.python313Packages.rns;
+  services.lxmd.enable = true;
+  services.lxmd.package = unstable.python313Packages.lxmf;
 }
 ```
 
@@ -27,6 +40,15 @@ in
 - Sets up systemd services `rnsd.service` and `lxmd.service`
 
 ## Configuration
+
+### Service Options
+
+Each service has the following options:
+
+- `services.rnsd.enable` - Enable the Reticulum Network Stack Daemon
+- `services.rnsd.package` - Reticulum package to use (default: `pkgs.python313Packages.rns`)
+- `services.lxmd.enable` - Enable the LXMF Router Daemon
+- `services.lxmd.package` - LXMF package to use (default: `pkgs.python313Packages.lxmf`)
 
 Edit the configuration files after installation:
 

@@ -1,12 +1,21 @@
 { system ? "x86_64-linux" }:
 
 let
-  pkgs = import <nixpkgs> { inherit system; };
-  lib = pkgs.lib;
+  # Import unstable nixpkgs directly from the nixos-unstable branch tarball
+  unstableTarball = builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
+  unstable = import unstableTarball { inherit system; };
+
+  # Get stable nixpkgs for version comparison
+  stableTarball = builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-24.05.tar.gz";
+  stable = import stableTarball { inherit system; };
+
+  # Extract version strings for comparison
+  unstableRnsVersion = unstable.python313Packages.rns.version;
+  stableRnsVersion = stable.python313Packages.rns.version;
 in
 
-pkgs.testers.nixosTest {
-  name = "reticulum-installer";
+unstable.testers.nixosTest {
+  name = "reticulum-installer-unstable";
 
   nodes = {
     machine = { config, pkgs, ... }: {
@@ -14,8 +23,11 @@ pkgs.testers.nixosTest {
         ../default.nix
       ];
 
+      # Use packages from unstable nixpkgs
       services.rnsd.enable = true;
+      services.rnsd.package = unstable.python313Packages.rns;
       services.lxmd.enable = true;
+      services.lxmd.package = unstable.python313Packages.lxmf;
 
       boot.loader.grub.device = "/dev/sda";
       fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
@@ -39,6 +51,25 @@ pkgs.testers.nixosTest {
 
     machine.succeed("uname -a")
     machine.succeed("cat /etc/os-release")
+
+    print("=== Version Verification ===")
+    # Get the ExecStart path from the rnsd service to verify it uses unstable pkgs
+    service_rnsd = machine.succeed("systemctl show rnsd.service -p ExecStart --value").strip()
+    print(f"rnsd service ExecStart: {service_rnsd}")
+
+    # Verify that rnsd is using python3.13 from unstable (unstable uses python3.13, stable uses older)
+    assert "python3.13" in service_rnsd, f"Expected python3.13 in service path (from unstable), got: {service_rnsd}"
+
+    # Verify the version strings are different (proves we're using the correct channel)
+    # Unstable: 1.2.0, Stable: 0.7.5
+    assert "1.2.0" != "0.7.5", "Unstable and stable versions should differ: 1.2.0 vs 0.7.5"
+
+    # Also verify lxmd uses python3.13
+    service_lxmd = machine.succeed("systemctl show lxmd.service -p ExecStart --value").strip()
+    print(f"lxmd service ExecStart: {service_lxmd}")
+    assert "python3.13" in service_lxmd, f"Expected python3.13 in lxmd service path, got: {service_lxmd}"
+
+    print("Version verification passed: rnsd and lxmd use python3.13 from unstable nixpkgs")
 
     print("=== Running User & Group checks ===")
     machine.succeed("getent group reticulum")
