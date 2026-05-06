@@ -3,18 +3,9 @@
 let
   cfg.rnsd = config.services.rnsd;
   cfg.lxmd = config.services.lxmd;
-  sharedCfg = config.services.reticulum;
 in
 {
   options = with lib; {
-    services.reticulum = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Enable shared configuration for Reticulum and LXMF";
-      };
-    };
-
     services.rnsd = {
       enable = mkOption {
         type = types.bool;
@@ -44,7 +35,7 @@ in
     };
   };
 
-  config = lib.mkIf (sharedCfg.enable || cfg.rnsd.enable || cfg.lxmd.enable) {
+  config = lib.mkIf (cfg.rnsd.enable || cfg.lxmd.enable) {
     users.groups = {
       reticulum = {};
       dialout = {};
