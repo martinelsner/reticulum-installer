@@ -30,3 +30,6 @@ venv.bak/
 *.log
 
 .kilo
+
+# Nix
+result

@@ -6,7 +6,6 @@
 #   sudo apt install qemu-system-x86 kvm
 #
 # Usage: bash test/run.sh
-#
 
 set -euo pipefail
 

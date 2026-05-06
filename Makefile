@@ -1,4 +1,4 @@
-.PHONY: test-alpine test-debian test
+.PHONY: test-alpine test-debian test test-nixos
 
 test: ## Run all installer tests (Alpine + Debian)
 	@echo "==> Running Alpine installer test"
@@ -12,6 +12,9 @@ test-alpine: ## Run Alpine installer test only
 
 test-debian: ## Run Debian installer test only
 	@bash debian/test/run.sh
+
+test-nixos: ## Run NixOS installer test with verbose output
+	@bash nixos/test/run.sh
 
 # Convenience targets
 .PHONY: help

@@ -2,19 +2,18 @@
 
 let
   cfg = config.services.reticulum;
-  inherit (pkgs) python314Packages;
 
   rnsd-config = pkgs.writeText "rnsd.config" (builtins.readFile ../config/rnsd.config);
   lxmd-config = pkgs.writeText "lxmd.config" (builtins.readFile ../config/lxmd.config);
 
   rnsd-status = pkgs.writeScriptBin "rnsd-status" ''
     #!${pkgs.bash}/bin/bash
-    exec ${python314Packages.rns}/bin/rnstatus --config /etc/reticulum "$@"
+    exec ${pkgs.python313Packages.rns}/bin/rnstatus --config /etc/reticulum "$@"
   '';
 
   lxmd-status = pkgs.writeScriptBin "lxmd-status" ''
     #!${pkgs.bash}/bin/bash
-    exec ${python314Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum --status "$@"
+    exec ${pkgs.python313Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum --status "$@"
   '';
 in
 {
@@ -69,7 +68,7 @@ in
         Type = "simple";
         User = "reticulum";
         Group = "reticulum";
-        ExecStart = "${python314Packages.rns}/bin/rnsd --config /etc/reticulum";
+        ExecStart = "${pkgs.python313Packages.rns}/bin/rnsd --config /etc/reticulum";
         Restart = "on-failure";
         RestartSec = "10s";
 
@@ -99,7 +98,7 @@ in
         Type = "simple";
         User = "reticulum";
         Group = "reticulum";
-        ExecStart = "${python314Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum";
+        ExecStart = "${pkgs.python313Packages.lxmf}/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum";
         Restart = "on-failure";
         RestartSec = "10s";
 
