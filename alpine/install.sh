@@ -28,30 +28,22 @@ echo ""
 
 echo "--- Installing system dependencies ---"
 apk update
-apk add python3 python3-dev py3-pip py3-virtualenv py3-cryptography py3-cffi build-base libffi-dev pkgconf
+apk add python3 py3-pip py3-cryptography py3-cffi py3-netifaces py3-pysocks
+apk add bluez dbus openrc runit
+
+echo "--- Installing rns, lxmf, bleak via pip ---"
+python3 -m ensurepip --default-pip 2>/dev/null || true
+python3 -m pip install --break-system-packages rns lxmf bleak
+
+for bin in rnsd lxmd; do
+    ln -sf "$(python3 -c 'import sysconfig; print(sysconfig.get_path(\"scripts\"))' 2>/dev/null || echo /usr/bin)/${bin}" "/usr/local/bin/${bin}"
+done
 echo "    System packages installed."
 
-VENV_DIR="/opt/reticulum"
+# ---------- Status Wrappers ----------
 
-echo "--- Installing Python packages ---"
-if [ ! -d "$VENV_DIR" ]; then
-    python3 -m venv --system-site-packages "$VENV_DIR"
-    echo "    Created virtualenv at $VENV_DIR"
-fi
-# 'bleak' is included to support running RNodes via Bluetooth
-"$VENV_DIR/bin/pip" install rns lxmf bleak
-echo "    rns, lxmf, and bleak installed in virtualenv."
-
-# Symlink binaries to system PATH
-for bin in rnsd lxmd; do
-    ln -sf "$VENV_DIR/bin/${bin}" "/usr/local/bin/${bin}"
-    echo "    Symlinked ${bin} -> /usr/local/bin/${bin}"
-done
-
-# Symlink status wrapper scripts
 for wrapper in rnsd-status lxmd-status; do
     ln -sf "${SCRIPT_DIR}/${wrapper}" "/usr/local/bin/${wrapper}"
-    echo "    Symlinked ${wrapper} -> /usr/local/bin/${wrapper}"
 done
 
 # ---------- User & Group ----------

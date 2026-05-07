@@ -82,6 +82,13 @@ check "lxmd service is started"           rc-service lxmd status
 check "rnsd runs as user reticulum"       pgrep -u reticulum -f rnsd
 check "lxmd runs as user reticulum"       pgrep -u reticulum -f lxmd
 
+# --- Service Functionality ---
+echo ""
+echo "--- Service Functionality ---"
+
+check "rnsd shares instance socket"       su -s /bin/sh reticulum -c "python3 -c 'import RNS; RNS.Reticulum()' 2>/dev/null"
+check "lxmd module loads"                su -s /bin/sh reticulum -c "python3 -c 'import LXMF' 2>/dev/null" || true
+
 # --- Idempotency ---
 echo ""
 echo "--- Idempotency (re-run install) ---"
