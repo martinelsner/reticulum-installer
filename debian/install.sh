@@ -37,7 +37,7 @@ echo "--- Installing Python packages ---"
 if [[ ! -d "$VENV_DIR" ]]; then
     python3 -m venv --system-site-packages "$VENV_DIR"
 fi
-"$VENV_DIR/bin/pip" install rns lxmf
+"$VENV_DIR/bin/pip" install --upgrade rns lxmf
 echo "    Done."
 
 # Symlink binaries to system PATH

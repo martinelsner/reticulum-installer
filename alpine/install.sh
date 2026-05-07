@@ -35,7 +35,7 @@ echo "--- Creating virtualenv with system packages ---"
 python3 -m venv --system-site-packages /opt/reticulum
 
 echo "--- Installing rns, lxmf, bleak via pip ---"
-/opt/reticulum/bin/pip install rns lxmf bleak
+/opt/reticulum/bin/pip install --upgrade rns lxmf bleak
 
 for bin in rnsd lxmd rnstatus; do
     ln -sf /opt/reticulum/bin/${bin} "/usr/local/bin/${bin}"
