@@ -1,0 +1,1 @@
+lxmd ALL=(ALL) NOPASSWD: /usr/local/bin/lxmd-status

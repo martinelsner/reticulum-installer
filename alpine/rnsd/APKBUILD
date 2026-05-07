@@ -1,0 +1,47 @@
+pkgname=rnsd
+pkgver=1.2.3
+pkgrel=0
+pkgdesc="Reticulum Network Stack Daemon"
+url="https://reticulum.network/"
+arch="x86_64"
+license="MIT"
+provides="rnstatus"
+depends="python3 py3-pip"
+pkgusers="rnsd"
+pkggroups="rnsd"
+options="!tracedeps"
+
+install="$pkgname.pre-install $pkgname.post-install"
+
+source="rnsd.initd sudoers-rnsd config $pkgname.pre-install $pkgname.post-install"
+
+prepare() {
+    :
+}
+
+build() {
+    :
+}
+
+package() {
+    install -Dm644 "$startdir/config" "$pkgdir/etc/reticulum/config"
+    install -Dm644 "$startdir/sudoers-rnsd" "$pkgdir/etc/sudoers.d/rnsd"
+    install -Dm755 "$startdir/rnsd.initd" "$pkgdir/etc/init.d/rnsd"
+
+    mkdir -p "$pkgdir/etc/reticulum/storage"
+    mkdir -p "$pkgdir/etc/reticulum/interfaces"
+    mkdir -p "$pkgdir/etc/conf.d"
+
+    python3 -m venv --copies "$pkgdir/usr/lib/rnsd"
+    "$pkgdir/usr/lib/rnsd/bin/pip" install --no-cache-dir rns lxmf bleak
+
+    chmod -R go+X "$pkgdir/usr/lib/rnsd/bin"
+
+    mkdir -p "$pkgdir/usr/bin"
+    ln -s ../lib/rnsd/bin/rnsd "$pkgdir/usr/bin/rnsd"
+    ln -s ../lib/rnsd/bin/rnstatus "$pkgdir/usr/bin/rnstatus"
+    ln -s ../lib/rnsd/bin/rnstatus "$pkgdir/usr/bin/rnsd-status"
+
+    echo "RETICULUM_USER=rnsd" > "$pkgdir/etc/conf.d/reticulum"
+    echo "RETICULUM_GROUP=rnsd" >> "$pkgdir/etc/conf.d/reticulum"
+}

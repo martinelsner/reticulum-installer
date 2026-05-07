@@ -1,0 +1,32 @@
+pkgname=lxmd
+pkgver=0.9.6
+pkgrel=0
+pkgdesc="LXMF Router Daemon"
+url="https://reticulum.network/"
+arch="x86_64"
+license="MIT"
+depends="rnsd"
+makedepends=""
+options="!check"
+
+source="lxmd.initd sudoers-lxmd config"
+
+prepare() {
+    :
+}
+
+build() {
+    :
+}
+
+package() {
+    install -Dm644 "$startdir/config" "$pkgdir/etc/lxmd/config"
+    install -Dm644 "$startdir/sudoers-lxmd" "$pkgdir/etc/sudoers.d/lxmd"
+    install -Dm755 "$startdir/lxmd.initd" "$pkgdir/etc/init.d/lxmd"
+
+    mkdir -p "$pkgdir/etc/reticulum/storage"
+    mkdir -p "$pkgdir/etc/lxmd"
+
+    ln -s "$pkgdir/usr/lib/rnsd/bin/lxmd" "$pkgdir/usr/bin/lxmd"
+    ln -s "$pkgdir/usr/lib/rnsd/bin/lxmd" "$pkgdir/usr/bin/lxmd-status"
+}

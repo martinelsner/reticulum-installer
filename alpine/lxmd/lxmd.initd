@@ -2,14 +2,15 @@
 
 description="LXMF Router Daemon"
 
-command="/opt/reticulum/bin/lxmd"
+command="/usr/lib/rnsd/bin/lxmd"
 command_args="--service --config /etc/lxmd --rnsconfig /etc/reticulum"
-command_user="reticulum:reticulum"
+command_user="lxmd:lxmd"
 command_background=true
 pidfile="/run/${RC_SVCNAME}.pid"
 
 depend() {
-    need net rnsd
+    need net
+    need rnsd
 }
 
 start_pre() {

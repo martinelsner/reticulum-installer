@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+
+mkdir -p /run/rnsd
+chown rnsd:rnsd /run/rnsd 2>/dev/null || true
+/sbin/rc-update add rnsd default 2>/dev/null || true

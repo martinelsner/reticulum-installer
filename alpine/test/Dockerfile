@@ -9,4 +9,4 @@ RUN mkdir -p /run/openrc && touch /run/openrc/softlevel
 # Copy the installer into the container
 COPY . /opt/reticulum-installer
 
-CMD ["/bin/bash"]
+CMD ["tail", "-f", "/dev/null"]

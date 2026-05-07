@@ -31,5 +31,7 @@ venv.bak/
 
 .kilo
 
-# Nix
-result
+# Package builds
+debian/build/
+alpine/build/
+nixos/result

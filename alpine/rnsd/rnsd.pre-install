@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+addgroup -S rnsd 2>/dev/null || true
+adduser -S -H -h /sbin/nologin -s /sbin/nologin -G rnsd rnsd 2>/dev/null || true

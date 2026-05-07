@@ -5,8 +5,8 @@ Wants=network.target
 
 [Service]
 Type=simple
-User=reticulum
-Group=reticulum
+User=rnsd
+Group=rnsd
 ExecStart=/opt/reticulum/bin/rnsd --config /etc/reticulum
 Restart=on-failure
 RestartSec=10s

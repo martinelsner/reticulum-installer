@@ -1,0 +1,39 @@
+name: lxmd
+version: "${LXMF_VERSION:-0.0.0}"
+arch: amd64
+description: LXMF Router Daemon
+vendor: Reticulum Network Stack
+homepage: https://reticulum.network/
+license: MIT
+maintainer: Reticulum Developer <dev@reticulum.network>
+provides:
+  - lxmd
+depends:
+  - rnsd
+section: net
+priority: optional
+
+contents:
+  - src: etc/lxmd
+    dst: /etc/lxmd
+    type: tree
+
+  - src: debian/lxmd/lxmd.service
+    dst: /etc/systemd/system/lxmd.service
+
+  - src: debian/lxmd/sudoers-lxmd
+    dst: /etc/sudoers.d/lxmd
+
+  - dst: /usr/local/bin/lxmd
+    type: symlink
+    src: /opt/reticulum/bin/lxmd
+
+  - dst: /usr/local/bin/lxmd-status
+    type: symlink
+    src: /opt/reticulum/bin/lxmd
+
+scripts:
+  preinstall: debian/lxmd/preinstall-lxmd.sh
+  postinstall: debian/lxmd/postinstall-lxmd.sh
+  preremove: debian/lxmd/preremove-lxmd.sh
+  postremove: debian/lxmd/postremove-lxmd.sh

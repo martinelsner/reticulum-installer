@@ -1,22 +1,52 @@
 # Reticulum + LXMF Installer
 
-This repository provides installation, configuration, and uninstallation scripts for deploying [Reticulum Network Stack](https://reticulum.network/) (`rnsd`) and its messaging router (`lxmd`) as background services. 
+This repository provides native packages for deploying [Reticulum Network Stack](https://reticulum.network/) and [LXMF](https://github.com/markqvist/LXMF) as background services.
 
-The scripts set up services within Python virtual environments running under a dedicated system user.
+## Packages
+
+Three packages are provided:
+
+| Package | Description |
+|---------|-------------|
+| `reticulum-common` | Python virtualenv with rns, lxmf, bleak + config directories |
+| `rnsd` | Reticulum Network Stack daemon (depends on reticulum-common) |
+| `lxmd` | LXMF Router daemon (depends on reticulum-common) |
+
+Each service runs under its own dedicated user.
 
 ## Supported Architectures
 
-Choose your operating system to view detailed installation instructions:
+- **Debian / Ubuntu / Linux Mint** - Install via `.deb` packages
+- **Alpine Linux** - Install via `.apk` packages
+- **NixOS** - Uses NixOS module (separate, not packaged here)
 
-- [**Debian / Ubuntu / Linux Mint**](debian/README.md) (uses `systemd` and `apt`)
-- [**Alpine Linux**](alpine/README.md) (uses `OpenRC` and `apk`)
-- [**NixOS**](nixos/README.md) (uses NixOS module and `systemd`)
+## Quick Install
+
+### Debian/Ubuntu
+
+```bash
+sudo dpkg -i reticulum-common_0.1.0_amd64.deb rnsd_0.1.0_amd64.deb lxmd_0.1.0_amd64.deb
+```
+
+### Alpine
+
+```bash
+sudo apk add --allow-untrusted reticulum-common_0.1.0_x86_64.apk rnsd_0.1.0_x86_64.apk lxmd_0.1.0_x86_64.apk
+```
+
+## Building from Source
+
+This project uses [nfpm](https://nfpm.goreleaser.com/) for packaging. To build packages:
+
+```bash
+nix-shell --run "make build"
+```
 
 ## Features
-- **Isolated:** Installs Python packages into a virtual environment at `/opt/reticulum`.
-- **Dedicated System User:** Services run as the unprivileged `reticulum` user. `dialout` access is granted for hardware interfaces like RNodes.
+- **Isolated:** Each service runs under its own dedicated user (`rnsd`, `lxmd`).
+- **Shared runtime:** Python virtualenv at `/opt/reticulum` is shared but configs are separate.
 - **Default Configuration:** Includes baseline configurations for typical router node setups.
-- **Testing:** Includes Docker-based integration tests.
+- **Package-based:** Uses native package managers for clean installation/removal.
 
 ## See Also
 

@@ -1,28 +1,26 @@
 # Alpine Installation
 
-Automated deployment for Alpine Linux. This environment leverages `apk` for system dependencies and `OpenRC` for lightweight background daemon persistence.
+Three packages must be installed in order:
+
+1. **`reticulum-common`** - Python virtualenv with rns, lxmf, bleak + config directories
+2. **`rnsd`** - Reticulum Network Stack daemon (depends on reticulum-common)
+3. **`lxmd`** - LXMF Router daemon (depends on reticulum-common)
 
 ## Quick Install
 
-To install `rnsd` and `lxmd` cleanly with all configurations and service dependencies, download the deployment files and run the installer from a temporary directory:
-
 ```bash
-sudo apk add curl
-curl -sSL https://codeberg.org/melsner/reticulum-installer/archive/main.tar.gz | tar -xz -C /tmp
-cd /tmp/reticulum-installer/alpine
-sudo sh install.sh
+sudo apk add --allow-untrusted reticulum-common_0.1.0_x86_64.apk rnsd_0.1.0_x86_64.apk lxmd_0.1.0_x86_64.apk
 ```
 
 ## What This Does
 
-Running the installer script will:
+The package installer will:
 
-1. Install required system packages (`python3`, `py3-pip`, `py3-virtualenv`).
-2. Build a virtual environment at `/opt/reticulum` and securely install `rns` and `lxmf`.
-3. Create the `reticulum` unprivileged system user.
-4. Establish `/etc/reticulum` for Reticulum config, `/etc/lxmd` for LXMF config, and `/etc/reticulum/storage` for shared storage.
-5. Setup, enable, and start the OpenRC initialization scripts: `/etc/init.d/rnsd` and `/etc/init.d/lxmd`.
-6. Symlink the software and status wrappers to `/usr/local/bin` for system-wide accessibility.
+1. Create dedicated users `rnsd` and `lxmd` (each with their own group).
+2. Establish `/etc/reticulum` for Reticulum config, `/etc/lxmd` for LXMF config.
+3. Install the Python virtual environment at `/opt/reticulum` with `rns`, `lxmf`, and `bleak`.
+4. Create OpenRC init scripts and enable/start the services.
+5. Symlink binaries to `/usr/local/bin` for system-wide accessibility.
 
 ## Data Files
 
@@ -34,23 +32,12 @@ Shared instance storage (identities, path tables, caches) is at `/etc/reticulum/
 LXMF configuration and data are stored in `/etc/lxmd/`:
 - **`lxmd` config**: `/etc/lxmd/config`
 
-## Managing the Service
+## Managing the Services
 
 **Service Status:**
 ```bash
 rc-service rnsd status
 rc-service lxmd status
-```
-
-**Viewing Logs:**
-```bash
-# System logs via OpenRC
-rc-service rnsd status
-rc-service lxmd status
-
-# If log_file is configured in the config:
-sudo tail -f /var/log/rnsd.log
-sudo tail -f /var/log/lxmd.log
 ```
 
 **Restarting After Config Changes:**
@@ -60,12 +47,12 @@ rc-service rnsd restart && rc-service lxmd restart
 
 ## Status Monitoring
 
-The installer also provides wrapper scripts for quick status checks:
+The packages provide wrapper scripts for quick status checks:
 
 - **`rnsd-status`** - Runs `rnstatus` to display Reticulum network interfaces and transport status.
-- **`lxmd-status`** - Runs `lxmd --status` to display LXMF router status, including peer connections and message statistics.
+- **`lxmd-status`** - Runs `lxmd --status` to display LXMF router status.
 
-Both scripts automatically use the correct configuration paths. No additional arguments are required, but any extra arguments will be passed through to the underlying command.
+Both scripts automatically use the correct configuration paths.
 
 ```bash
 # Check Reticulum status
@@ -77,14 +64,12 @@ lxmd-status
 
 ## Uninstallation
 
-If you wish to cleanly tear down the virtual environment and stop the services completely, while leaving your user data and identity intact, run the uninstall script:
-
 ```bash
-sudo sh uninstall.sh
+sudo apk del lxmd rnsd reticulum-common
 ```
 
 To purge the deployment entirely (including identities, messages and databases), also run:
 ```bash
 sudo rm -rf /etc/reticulum /etc/lxmd
-sudo deluser reticulum
+sudo deluser rnsd lxmd
 ```

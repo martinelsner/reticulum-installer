@@ -1,0 +1,62 @@
+name: rnsd
+version: "${RNS_VERSION:-0.0.0}"
+arch: amd64
+description: Reticulum Network Stack Daemon
+vendor: Reticulum Network Stack
+homepage: https://reticulum.network/
+license: MIT
+maintainer: Reticulum Developer <dev@reticulum.network>
+provides:
+  - rnsd
+  - rnstatus
+depends:
+  - python3
+  - python3-pip
+  - python3-venv
+  - python3-cryptography
+  - python3-cffi
+  - libffi
+  - build-base
+  - pkgconf
+recommends:
+  - libacl1
+suggests:
+  - bleak
+section: net
+priority: optional
+
+contents:
+  - src: opt/reticulum
+    dst: /opt/reticulum
+    type: tree
+
+  - src: etc/reticulum
+    dst: /etc/reticulum
+    type: tree
+
+  - src: etc/default/reticulum
+    dst: /etc/default/reticulum
+
+  - src: debian/rnsd/rnsd.service
+    dst: /etc/systemd/system/rnsd.service
+
+  - src: debian/rnsd/sudoers-rnsd
+    dst: /etc/sudoers.d/rnsd
+
+  - dst: /usr/local/bin/rnsd
+    type: symlink
+    src: /opt/reticulum/bin/rnsd
+
+  - dst: /usr/local/bin/rnsd-status
+    type: symlink
+    src: /opt/reticulum/bin/rnstatus
+
+  - dst: /usr/local/bin/rnstatus
+    type: symlink
+    src: /opt/reticulum/bin/rnstatus
+
+scripts:
+  preinstall: debian/rnsd/preinstall-rnsd.sh
+  postinstall: debian/rnsd/postinstall-rnsd.sh
+  preremove: debian/rnsd/preremove-rnsd.sh
+  postremove: debian/rnsd/postremove-rnsd.sh

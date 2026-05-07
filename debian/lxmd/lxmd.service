@@ -6,8 +6,8 @@ Wants=network.target
 
 [Service]
 Type=simple
-User=reticulum
-Group=reticulum
+User=lxmd
+Group=lxmd
 ExecStart=/opt/reticulum/bin/lxmd --config /etc/lxmd --rnsconfig /etc/reticulum
 Restart=on-failure
 RestartSec=10s
