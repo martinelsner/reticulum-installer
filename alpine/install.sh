@@ -28,17 +28,19 @@ echo ""
 
 echo "--- Installing system dependencies ---"
 apk update
-apk add python3 py3-pip py3-cryptography py3-cffi py3-netifaces py3-pysocks
-apk add bluez dbus openrc runit
+apk add python3 py3-pip py3-cryptography py3-cffi py3-pyserial
+apk add bluez dbus openrc
+
+echo "--- Creating virtualenv with system packages ---"
+python3 -m venv --system-site-packages /opt/reticulum
 
 echo "--- Installing rns, lxmf, bleak via pip ---"
-python3 -m ensurepip --default-pip 2>/dev/null || true
-python3 -m pip install --break-system-packages rns lxmf bleak
+/opt/reticulum/bin/pip install rns lxmf bleak
 
-for bin in rnsd lxmd; do
-    ln -sf "$(python3 -c 'import sysconfig; print(sysconfig.get_path(\"scripts\"))' 2>/dev/null || echo /usr/bin)/${bin}" "/usr/local/bin/${bin}"
+for bin in rnsd lxmd rnstatus; do
+    ln -sf /opt/reticulum/bin/${bin} "/usr/local/bin/${bin}"
 done
-echo "    System packages installed."
+echo "    Done."
 
 # ---------- Status Wrappers ----------
 

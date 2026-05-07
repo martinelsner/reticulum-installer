@@ -2,7 +2,7 @@
 
 description="Reticulum Network Stack Daemon"
 
-command="/usr/local/bin/rnsd"
+command="/opt/reticulum/bin/rnsd"
 command_args="--service --config /etc/reticulum"
 command_user="reticulum:reticulum"
 command_background=true
