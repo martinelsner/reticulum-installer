@@ -18,7 +18,7 @@ sudo sh install.sh
 Running the installer script will:
 
 1. Install required system packages (`python3`, `py3-pip`, `py3-virtualenv`).
-2. Build a virtual environment at `/opt/reticulum` and securely install `rns` and `lxmf`.
+2. Build a virtual environment at `/opt/reticulum` and securely install `rns` and `lxmf`. Running the installer again upgrades both packages to their latest versions.
 3. Create the `reticulum` unprivileged system user.
 4. Establish `/etc/reticulum` for Reticulum config, `/etc/lxmd` for LXMF config, and `/etc/reticulum/storage` for shared storage.
 5. Setup, enable, and start the OpenRC initialization scripts: `/etc/init.d/rnsd` and `/etc/init.d/lxmd`.
