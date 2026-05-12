@@ -28,7 +28,7 @@ echo ""
 
 echo "--- Installing system dependencies ---"
 apt-get update
-apt-get install -y python3 python3-pip python3-venv python3-cryptography python3-serial python3-bleak python3-qrcode
+apt-get install -y python3 python3-pip python3-venv python3-cryptography python3-serial python3-bleak
 echo "    System packages installed."
 
 VENV_DIR="/opt/reticulum"
